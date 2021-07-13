@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "464767169726",
+    "project_id": "cab-driving-abee4",
+    "storage_bucket": "cab-driving-abee4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464767169726:android:4d56238adf8f682cf0daef",
+        "android_client_info": {
+          "package_name": "com.itsgujrat.driving_app_its"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464767169726-dtgprh0i9rte9mm4qp9ki90qg7mpf0mu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.itsgujrat.driving_app_its",
+            "certificate_hash": "9ce4d3dfb0caa860b5353b6cd93d0e3a7129fa31"
+          }
+        },
+        {
+          "client_id": "464767169726-0032qujp49pm4j9nm1mh89kbev7m0534.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGZq6dqMEbYefSbw8iJ-g5zUtzolLDKbA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464767169726-0032qujp49pm4j9nm1mh89kbev7m0534.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
