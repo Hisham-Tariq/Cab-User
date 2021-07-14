@@ -163,6 +163,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         // Automatic handling of the SMS code on Android devices.
         await auth.signInWithCredential(credential);
+
         this.setState(() {
           this.buttonState = ButtonState.success();
           Future.delayed(Duration(seconds: 1)).then((value) {

@@ -18,12 +18,12 @@ class _SplashScreenState extends State<SplashScreen> {
     // print(widget.allowNavigate);
     super.initState();
     // if (widget.allowNavigate)
-    Firebase.initializeApp().then((value) {
-      Get.off(() => IntroScreen());
-    });
-    // Future.delayed(Duration(seconds: 2)).then((value) {
+    // Firebase.initializeApp().then((value) {
     //   Get.off(() => IntroScreen());
     // });
+    Future.delayed(Duration(seconds: 2)).then((value) {
+      Get.off(() => IntroScreen());
+    });
   }
 
   @override
