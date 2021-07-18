@@ -47,6 +47,8 @@ dependencies:
   # Dependency for Finding Current Loc + Places
   geolocator: ^7.3.0
   geocoding: ^2.0.0
+  animate_do: ^2.0.0
+  timelines: ^0.1.0
 
 
 

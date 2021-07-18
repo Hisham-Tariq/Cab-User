@@ -1,6 +1,8 @@
+import 'package:driving_app_its/controller/controller.dart';
 import 'package:driving_app_its/controller/direction.controller.dart';
 import 'package:driving_app_its/customization/colors.dart';
 import 'package:driving_app_its/models/models.dart';
+import 'package:driving_app_its/models/place.model.dart';
 import 'package:driving_app_its/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:timelines/timelines.dart';
 
 enum BookingState { pickup, destination, rideSelection, review, done }
 
@@ -36,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _destinationAddress;
   Directions? _info;
 
+  bool isScheduling = false;
+
   _HomeScreenState() {
     bookingStateWidgets = {
       BookingState.pickup: _pickupWidget,
@@ -52,8 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
       this.setState(() {
         this._currentPosition = value;
         _currentCameraCoordinates = LatLng(value.latitude, value.longitude);
+        print(value.latitude);
+        print(value.longitude);
         _getAddressFromLatLng(value.latitude, value.longitude).then((address) {
           this.setState(() {
+            print('Address: $address');
             _currentAddress = address;
             _pickupAddress = address;
           });
@@ -83,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : Stack(
                 alignment: Alignment.center,
                 children: [
+                  // Google Map
                   GoogleMap(
                     zoomControlsEnabled: false,
                     myLocationEnabled: true,
@@ -126,6 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onCameraIdle: () {},
                     // onLongPress: _addMarker,
                   ),
+                  // Middle Circle
                   Positioned(
                     child: Icon(
                       Icons.circle,
@@ -133,34 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppColors.primary,
                     ),
                   ),
-                  if (_info != null)
-                    Positioned(
-                      top: 20.0,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 6.0,
-                          horizontal: 12.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.yellowAccent,
-                          borderRadius: BorderRadius.circular(20.0),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 2),
-                              blurRadius: 6.0,
-                            )
-                          ],
-                        ),
-                        child: Text(
-                          '${_info!.totalDistance}, ${_info!.totalDuration}',
-                          style: const TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+                  // Bottom Container
+                  // TODO: Add If to show at the start only
                   Positioned(
                     left: 0,
                     right: 0,
@@ -175,48 +159,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 50,
-                              width: double.infinity,
-                              child: Row(
-                                children: [
-                                  ArrowIcons(
-                                    icon: Icons.arrow_back,
-                                    isActive: false,
-                                  ),
-                                  Expanded(
-                                    child: Center(
-                                      child: Text(
-                                        'TOP',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  ArrowIcons(
-                                    icon: Icons.arrow_forward,
-                                    isActive: false,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: AnimatedContainer(
-                                // curve: Curves.easeInOutExpo,
-                                duration: Duration(seconds: 2),
-                                child:
-                                    bookingStateWidgets[currentBookingState](),
-                              ),
-                            ),
-                          ],
+                        child: _ScheduleTripButton(
+                          onSchedule: () {
+                            this.setState(() {
+                              this.isScheduling = true;
+                            });
+                          },
                         ),
                       ),
                     ),
                   ),
+                  if (this.isScheduling)
+                    Positioned(
+                      child: _PickupAndDestinationLocationPicker(
+                        currentAddress: this._currentAddress as String,
+                        currentLocation: LatLng(
+                          _currentPosition!.latitude,
+                          _currentPosition!.longitude,
+                        ),
+                        onClose: () {
+                          this.setState(() {
+                            this.isScheduling = false;
+                          });
+                        },
+                        onDestinationSelected: (value) {},
+                        onPickupSelected: (value) {},
+                      ),
+                    ),
                 ],
               ),
         // floatingActionButton: FloatingActionButton(
@@ -266,7 +235,12 @@ class _HomeScreenState extends State<HomeScreen> {
         long,
       );
       Placemark place = p[0];
-      return "${place.locality}, ${place.postalCode}, ${place.country}";
+      print('admin: ${place.administrativeArea}');
+      print('subAdmin: ${place.subAdministrativeArea}');
+      print('locality: ${place.locality}');
+      print('subLocality: ${place.subLocality}');
+      print('street: ${place.street}');
+      return "${place.subLocality}, ${place.street}, ${place.locality}";
     } catch (e) {
       print(e);
     }
@@ -364,8 +338,265 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class ArrowIcons extends StatelessWidget {
-  ArrowIcons({Key? key, required this.icon, required this.isActive})
+class _ScheduleTripButton extends StatelessWidget {
+  const _ScheduleTripButton({Key? key, required this.onSchedule})
+      : super(key: key);
+  final Callback onSchedule;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Good Afternoon Test',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        VerticalAppSpacer(),
+        GestureDetector(
+          onTap: onSchedule,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 10.0,
+            ),
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(
+                20.0,
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Where to?',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10.0),
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                      15.0,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Schedule',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PickupAndDestinationLocationPicker extends StatefulWidget {
+  final String currentAddress;
+  final LatLng currentLocation;
+  final Callback onClose;
+  final void Function(dynamic) onDestinationSelected;
+  final void Function(dynamic) onPickupSelected;
+
+  const _PickupAndDestinationLocationPicker({
+    Key? key,
+    required this.onClose,
+    required this.onDestinationSelected,
+    required this.onPickupSelected,
+    this.currentAddress = '',
+    required this.currentLocation,
+  }) : super(key: key);
+
+  @override
+  __PickupAndDestinationLocationPickerState createState() =>
+      __PickupAndDestinationLocationPickerState();
+}
+
+class __PickupAndDestinationLocationPickerState
+    extends State<_PickupAndDestinationLocationPicker> {
+  bool isDestinationSelected = false;
+  final pickupController = TextEditingController();
+  final searchPlaceDebouncer = Debouncer(miliseconds: 300);
+  List<Place> places = [];
+
+  @override
+  void initState() {
+    super.initState();
+    this.pickupController.text = widget.currentAddress;
+  }
+
+  __PickupAndDestinationLocationPickerState() {
+    // if (widget.currentAddress == null) print('Yes it is');
+    //
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
+      color: Colors.white,
+      height: double.infinity,
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: widget.onClose,
+                child: Icon(Icons.clear_rounded),
+              ),
+            ],
+          ),
+          VerticalAppSpacer(space: 24.0),
+          Row(
+            children: [
+              HorizontalAppSpacer(space: 50),
+              Expanded(
+                child: TextFormField(
+                  enabled: false,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 13.0,
+                  ),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(left: 30.0),
+                  ),
+                  initialValue: 'Sun, 18-July at 12:44 PM',
+                ),
+              ),
+            ],
+          ),
+          VerticalAppSpacer(),
+          Row(
+            children: [
+              Container(
+                width: 50,
+                child: Column(
+                  children: [
+                    DotIndicator(color: AppColors.primary),
+                    // !isDestinationSelected
+                    //     ? DotIndicator(color: AppColors.primary)
+                    //     : OutlinedDotIndicator(color: AppColors.primary),
+                    SizedBox(
+                      height: 60.0,
+                      child: isDestinationSelected
+                          ? SolidLineConnector(color: AppColors.primary)
+                          : DashedLineConnector(color: AppColors.primary),
+                    ),
+                    isDestinationSelected
+                        ? DotIndicator(color: AppColors.primary)
+                        : OutlinedDotIndicator(color: AppColors.primary),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: pickupController,
+                      style: TextStyle(
+                        fontSize: 13.0,
+                      ),
+                      decoration: InputDecoration(
+                          hintText: 'From?',
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13.0,
+                          )),
+                      onTap: () {
+                        if (this.isDestinationSelected)
+                          this.setState(() {
+                            this.isDestinationSelected = false;
+                          });
+                      },
+                    ),
+                    VerticalAppSpacer(),
+                    TextField(
+                      style: TextStyle(
+                        fontSize: 13.0,
+                      ),
+                      decoration: InputDecoration(
+                          hintText: 'Where to?',
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13.0,
+                          )),
+                      onTap: () {
+                        if (!this.isDestinationSelected)
+                          this.setState(() {
+                            this.isDestinationSelected = true;
+                          });
+                      },
+                      onChanged: (value) {
+                        searchPlaceDebouncer.run(() {
+                          var controller = PlaceController();
+                          controller
+                              .getNearbyPlaces(
+                            userLocation: widget.currentLocation,
+                            keyword: value,
+                          )
+                              .then((value) {
+                            this.setState(() {
+                              this.places = value;
+                            });
+                          });
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          VerticalAppSpacer(space: 24),
+          Expanded(
+            child: ListView.builder(
+              itemCount: places.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: Container(
+                    height: 30,
+                    width: 30,
+                    child: Icon(
+                      Icons.place,
+                      color: Colors.white,
+                      size: 20.0,
+                    ),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  title: Text(places[index].name),
+                  subtitle: Text(places[index].address),
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _ArrowIcons extends StatelessWidget {
+  _ArrowIcons({Key? key, required this.icon, required this.isActive})
       : super(key: key);
   final IconData icon;
   final bool isActive;

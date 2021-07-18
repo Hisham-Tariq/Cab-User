@@ -23,7 +23,9 @@ class MyApp extends StatelessWidget {
         ),
         inputDecorationTheme: InputDecorationTheme(
           contentPadding: EdgeInsets.symmetric(horizontal: 15),
-          border: OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999.0),
+          ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: AppColors.primary, width: 2),
             borderRadius: BorderRadius.circular(999.0),
@@ -52,3 +54,4 @@ class MyApp extends StatelessWidget {
 // Primary Color: Colors.green
 // BackgroundColor; Colors.white
 //
+// TODO: Change the Async Button to Progress Button.
