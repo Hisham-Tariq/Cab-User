@@ -21,7 +21,8 @@ class IntroScreen extends StatelessWidget {
                 SizedBox(height: 100),
                 // SignIn Button
                 FullTextButton(
-                  onPressed: () => Get.to(() => PhoneInputScreen()),
+                  onPressed: () =>
+                      Get.to(() => PhoneInputScreen(isNewUser: false)),
                   text: 'Login',
                 ),
                 // SignUp Button
@@ -34,7 +35,7 @@ class IntroScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'By chosing one or the other, you are agreeing to the',
+                  'By choosing one or the other, you are agreeing to the',
                   style: AppTextStyle.description,
                 ),
                 Row(
@@ -73,7 +74,7 @@ class IntroScreen extends StatelessWidget {
   }
 }
 
-//                                      TODO:  Current Page Tasks      ✘  or ✔
+//                      TODO:  Current Page Tasks      ✘  or ✔
 //
 // TODO:        Task Name                                              Status
 // TODO:        Add Terms & Services                                     ✘

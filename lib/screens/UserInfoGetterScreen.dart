@@ -14,15 +14,29 @@ class UserInfoGetterScreen extends StatefulWidget {
 }
 
 class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
+  late UserController _userController;
   final _formKey = GlobalKey<FormState>();
 
   final firstNameController = TextEditingController();
+  final firstNameNode = FocusNode();
 
   final lastNameController = TextEditingController();
+  final lastNameNode = FocusNode();
 
   final emailController = TextEditingController();
+  final emailNode = FocusNode();
 
   ButtonState buttonState = ButtonState.idle();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (!Get.isRegistered<UserController>())
+      this._userController = Get.put(UserController());
+    else
+      this._userController = Get.find<UserController>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,13 +91,10 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                       SizedBox(height: 4),
                       TextFormField(
                         controller: firstNameController,
+                        focusNode: firstNameNode,
                         validator: (value) {
                           return value!.isEmpty ? 'Invalid Value' : null;
                         },
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: OutlineInputBorder(),
-                        ),
                       ),
                       SizedBox(height: 4),
                       // Password
@@ -97,13 +108,10 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                       SizedBox(height: 4),
                       TextFormField(
                         controller: lastNameController,
+                        focusNode: lastNameNode,
                         validator: (value) {
                           return value!.isEmpty ? 'Invalid Value' : null;
                         },
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: OutlineInputBorder(),
-                        ),
                       ),
                       SizedBox(height: 4),
                       Text(
@@ -115,14 +123,11 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                       ),
                       SizedBox(height: 4),
                       TextFormField(
+                        focusNode: emailNode,
                         controller: emailController,
                         validator: (value) {
                           return value!.isEmpty ? 'Invalid Value' : null;
                         },
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          border: OutlineInputBorder(),
-                        ),
                       ),
                       SizedBox(height: 4),
                       Center(
@@ -146,26 +151,6 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                           onPressed: handleAddUserData,
                         ),
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () {},
-                              child: Text(
-                                'Continue',
-                                style: GoogleFonts.catamaran(
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                minimumSize: Size(100, 45),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -177,19 +162,43 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
     );
   }
 
+  changeButtonStateToError() {
+    this.setState(() {
+      buttonState = ButtonState.error();
+      Future.delayed(Duration(seconds: 1)).then((value) {
+        this.setState(() {
+          buttonState = ButtonState.idle();
+        });
+      });
+    });
+  }
+
+  unFocusFields() {
+    firstNameNode.unfocus();
+    lastNameNode.unfocus();
+    emailNode.unfocus();
+  }
+
   Future<void> handleAddUserData() async {
+    // Remove Focus From Fields on Tap
+    this.unFocusFields();
+    // Validate The Form
     if (!_formKey.currentState!.validate()) return;
+    // Set Button State = Loading
     this.setState(() {
       buttonState = ButtonState.loading();
     });
-    UserController userController = Get.put(UserController());
+    // Add Users Data to User's DataModel
     final _user = UserModel(
       email: emailController.text,
       firstName: firstNameController.text,
       lastName: lastNameController.text,
+      phoneNumber: this._userController.currentUserPhoneNumber,
     );
-    userController.setUser(_user);
-    if (await userController.createUser()) {
+    this._userController.setUser(_user);
+    // Add the User Personal Info in the Firestore
+    if (await this._userController.createUser()) {
+      // After Successfully Added the User's Data
       this.setState(() {
         buttonState = ButtonState.success();
         Future.delayed(Duration(seconds: 1)).then((value) {
@@ -198,14 +207,13 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
         });
       });
     } else {
-      this.setState(() {
-        buttonState = ButtonState.error();
-        Future.delayed(Duration(seconds: 1)).then((value) {
-          this.setState(() {
-            buttonState = ButtonState.idle();
-          });
-        });
-      });
+      // Error While adding the User's Data
+      changeButtonStateToError();
     }
   }
 }
+
+//                      TODO:  Current Page Tasks      ✘  or ✔
+//
+// TODO:        Task Name                                              Status
+// TODO:        Add Focus Nodes to TextFormFields                         ✔

@@ -22,11 +22,16 @@ class MyApp extends StatelessWidget {
           cursorColor: AppColors.primary,
         ),
         inputDecorationTheme: InputDecorationTheme(
-          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+          contentPadding: EdgeInsets.symmetric(horizontal: 15),
           border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.primary, width: 2),
+            borderRadius: BorderRadius.circular(999.0),
+          ),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
+            primary: Colors.white,
             backgroundColor: AppColors.primary,
             textStyle: AppTextStyle.button,
             minimumSize: Size(150, 45),
@@ -43,17 +48,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// TODO: Remove Catptcha                                      DONE
-// TODO: Add Interactivity on Buttons
-// TODO: Add SingleChildScrollView
-// TODO: Phone And Password Login
-// TODO: User Info:
-//  TODO: 1. Phone
-//  TODO: 2. Name
-//  TODO: 3. Name
-//  TODO: 4. Password
-
 // Theming
 // Primary Color: Colors.green
 // BackgroundColor; Colors.white

@@ -31,6 +31,7 @@ class FullTextButton extends StatelessWidget {
             ),
             style: TextButton.styleFrom(
               backgroundColor: this.buttonColor ?? AppColors.primary,
+              shape: StadiumBorder(),
             ),
           ),
         ),

@@ -1,12 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 class UserModel {
   String? id;
   String? firstName;
   String? lastName;
   String? email;
-  UserModel({this.id, this.firstName, this.lastName, this.email});
+  String? phoneNumber;
+  UserModel({
+    this.id,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.phoneNumber,
+  });
 
   // UserModel.fromJson(Map<String, dynamic> json) {
   //   this.id = json['id'];
@@ -17,5 +21,6 @@ class UserModel {
         'firstName': this.firstName,
         'lastName': this.lastName,
         'email': this.email,
+        'phoneNumber': this.phoneNumber,
       };
 }

@@ -1,5 +1,6 @@
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:driving_app_its/customization/customization.dart';
+import 'package:driving_app_its/screens/HomeScreen.dart';
 import 'package:driving_app_its/screens/UserInfoGetterScreen.dart';
 import 'package:driving_app_its/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,15 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 class OTPScreen extends StatefulWidget {
   final String verificationId;
   final int? forceResendingToken;
+  final bool isNewUser;
 
   OTPScreen({
     Key? key,
     required this.verificationId,
     this.forceResendingToken,
+    this.isNewUser = true,
   }) : super(key: key);
 
   @override
@@ -25,9 +29,21 @@ class OTPScreen extends StatefulWidget {
 class _OTPScreenState extends State<OTPScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final otpController = TextEditingController();
-
+  // final otpController = TextEditingController();
+  String otpCode = '';
   ButtonState buttonState = ButtonState.idle();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SmsAutoFill().listenForCode;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,16 +72,36 @@ class _OTPScreenState extends State<OTPScreen> {
                         ),
                       ),
                       SizedBox(height: 4),
-                      TextFormField(
-                        controller: otpController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        validator: (value) {
-                          return value!.isEmpty ? 'Invalid Value' : null;
+                      TextFieldPinAutoFill(
+                        codeLength: 6,
+                        onCodeChanged: (value) {
+                          print(value);
+                          // print(otpController.text);
+                          otpCode = value;
+                          if (value.length == 6) verifyOTPCode();
                         },
                       ),
+                      // PinFieldAutoFill(
+                      //   codeLength: 6,
+                      //   // controller: otpController,
+                      //   keyboardType: TextInputType.number,
+                      //   // decoration: ,
+                      //   onCodeChanged: (value) {
+                      //     print(value);
+                      //     // print(otpController.text);
+                      //     if (value!.length == 6) verifyOTPCode();
+                      //   },
+                      // ),
+                      // TextFormField(
+                      //   // controller: otpController,
+                      //   keyboardType: TextInputType.number,
+                      //   inputFormatters: [
+                      //     FilteringTextInputFormatter.digitsOnly
+                      //   ],
+                      //   validator: (value) {
+                      //     return value!.isEmpty ? 'Invalid Value' : null;
+                      //   },
+                      // ),
                       SizedBox(height: 4),
                       Center(
                         child: AsyncAnimatedButton(
@@ -123,11 +159,11 @@ class _OTPScreenState extends State<OTPScreen> {
   }
 
   Future<void> verifyOTPCode() async {
-    if (!_formKey.currentState!.validate()) return;
+    // if (!_formKey.currentState!.validate()) return;
     this.setState(() {
       buttonState = ButtonState.loading();
     });
-    var otpCode = otpController.text;
+    // var otpCode = otpController.text;
     FirebaseAuth auth = FirebaseAuth.instance;
 
     // Create a PhoneAuthCredential with the code
@@ -143,7 +179,13 @@ class _OTPScreenState extends State<OTPScreen> {
         buttonState = ButtonState.success();
       });
       await Future.delayed(Duration(seconds: 1));
-      Get.to(() => UserInfoGetterScreen());
+      // Remove the Listen to OTP Code
+      await SmsAutoFill().unregisterListener();
+      if (widget.isNewUser) {
+        Get.to(() => UserInfoGetterScreen());
+      } else {
+        Get.off(() => HomeScreen());
+      }
     } catch (e) {
       this.setState(() {
         buttonState = ButtonState.error();

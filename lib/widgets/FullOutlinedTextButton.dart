@@ -30,13 +30,19 @@ class FullOutlinedTextButton extends StatelessWidget {
             style: TextButton.styleFrom(
               backgroundColor: Colors.white,
               primary: this.buttonColor ?? AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
+              shape: StadiumBorder(
                 side: BorderSide(
                   color: this.buttonColor ?? AppColors.primary,
                   width: 1,
                 ),
               ),
+              // shape: RoundedRectangleBorder(
+              //   borderRadius: BorderRadius.circular(5.0),
+              //   side: BorderSide(
+              //     color: this.buttonColor ?? AppColors.primary,
+              //     width: 1,
+              //   ),
+              // ),
             ),
           ),
         ),
