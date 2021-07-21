@@ -1,4 +1,4 @@
-import 'package:async_button_builder/async_button_builder.dart';
+// import 'package:async_button_builder/async_button_builder.dart';
 import 'package:driving_app_its/customization/customization.dart';
 import 'package:driving_app_its/screens/HomeScreen.dart';
 import 'package:driving_app_its/screens/UserInfoGetterScreen.dart';
@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_state_button/iconed_button.dart';
+import 'package:progress_state_button/progress_button.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 
 class OTPScreen extends StatefulWidget {
@@ -31,7 +33,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   // final otpController = TextEditingController();
   String otpCode = '';
-  ButtonState buttonState = ButtonState.idle();
+  ButtonState buttonState = ButtonState.idle;
 
   @override
   void initState() {
@@ -78,75 +80,75 @@ class _OTPScreenState extends State<OTPScreen> {
                           print(value);
                           // print(otpController.text);
                           otpCode = value;
-                          if (value.length == 6) verifyOTPCode();
+                          if (value.length == 6) {
+                            Future.delayed(Duration(milliseconds: 10))
+                                .then((value) {
+                              verifyOTPCode();
+                            });
+                          }
                         },
                       ),
-                      // PinFieldAutoFill(
-                      //   codeLength: 6,
-                      //   // controller: otpController,
-                      //   keyboardType: TextInputType.number,
-                      //   // decoration: ,
-                      //   onCodeChanged: (value) {
-                      //     print(value);
-                      //     // print(otpController.text);
-                      //     if (value!.length == 6) verifyOTPCode();
-                      //   },
-                      // ),
-                      // TextFormField(
-                      //   // controller: otpController,
-                      //   keyboardType: TextInputType.number,
-                      //   inputFormatters: [
-                      //     FilteringTextInputFormatter.digitsOnly
-                      //   ],
-                      //   validator: (value) {
-                      //     return value!.isEmpty ? 'Invalid Value' : null;
-                      //   },
-                      // ),
                       SizedBox(height: 4),
-                      Center(
-                        child: AsyncAnimatedButton(
-                          stateColors: {
-                            AsyncButtonState.orElse: AppColors.primary,
-                            AsyncButtonState.fail: Colors.red,
-                          },
-                          stateTexts: {
-                            AsyncButtonState.idle: 'Verify',
-                            AsyncButtonState.success: 'Success',
-                            AsyncButtonState.fail: 'Fail',
-                          },
-                          stateIcons: {
-                            AsyncButtonState.idle: Icons.arrow_right_alt,
-                            AsyncButtonState.success:
-                                Icons.check_circle_outline_rounded,
-                            AsyncButtonState.fail: Icons.cancel_outlined,
-                          },
-                          buttonState: buttonState,
-                          onPressed: verifyOTPCode,
-                        ),
-                      ),
-                      // Row(
-                      //   children: [
-                      //     Expanded(
-                      //       child: TextButton(
-                      //         onPressed: () {
-                      //           if (!_formKey.currentState!.validate()) return;
-                      //           verifyOTPCode();
-                      //         },
-                      //         child: Text(
-                      //           'Verify',
-                      //           style: GoogleFonts.catamaran(
-                      //             fontWeight: FontWeight.w800,
-                      //             color: Colors.white,
-                      //           ),
-                      //         ),
-                      //         style: TextButton.styleFrom(
-                      //           backgroundColor: Colors.green,
-                      //           minimumSize: Size(100, 45),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
+                      // Center(
+                      //   child: AsyncAnimatedButton(
+                      //     stateColors: {
+                      //       AsyncButtonState.orElse: AppColors.primary,
+                      //       AsyncButtonState.fail: Colors.red,
+                      //     },
+                      //     stateTexts: {
+                      //       AsyncButtonState.idle: 'Verify',
+                      //       AsyncButtonState.success: 'Success',
+                      //       AsyncButtonState.fail: 'Fail',
+                      //     },
+                      //     stateIcons: {
+                      //       AsyncButtonState.idle: Icons.arrow_right_alt,
+                      //       AsyncButtonState.success:
+                      //           Icons.check_circle_outline_rounded,
+                      //       AsyncButtonState.fail: Icons.cancel_outlined,
+                      //     },
+                      //     buttonState: buttonState,
+                      //     onPressed: verifyOTPCode,
+                      //   ),
                       // ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: ProgressButton.icon(
+                              iconedButtons: {
+                                ButtonState.idle: IconedButton(
+                                  text: "Verify",
+                                  icon: Icon(Icons.arrow_forward,
+                                      color: Colors.white),
+                                  color: AppColors.primary,
+                                ),
+                                ButtonState.loading: IconedButton(
+                                  text: "Loading",
+                                  color: AppColors.primary,
+                                ),
+                                ButtonState.fail: IconedButton(
+                                  text: "Failed",
+                                  icon: Icon(Icons.cancel, color: Colors.white),
+                                  color: AppColors.error,
+                                ),
+                                ButtonState.success: IconedButton(
+                                  text: "Success",
+                                  icon: Icon(
+                                    Icons.check_circle,
+                                    color: Colors.white,
+                                  ),
+                                  color: AppColors.primary,
+                                )
+                              },
+                              onPressed: this.verifyOTPCode,
+                              state: this.buttonState,
+                              progressIndicator: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -161,7 +163,7 @@ class _OTPScreenState extends State<OTPScreen> {
   Future<void> verifyOTPCode() async {
     // if (!_formKey.currentState!.validate()) return;
     this.setState(() {
-      buttonState = ButtonState.loading();
+      buttonState = ButtonState.loading;
     });
     // var otpCode = otpController.text;
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -176,7 +178,7 @@ class _OTPScreenState extends State<OTPScreen> {
     try {
       await auth.signInWithCredential(credential);
       this.setState(() {
-        buttonState = ButtonState.success();
+        buttonState = ButtonState.success;
       });
       await Future.delayed(Duration(seconds: 1));
       // Remove the Listen to OTP Code
@@ -188,10 +190,10 @@ class _OTPScreenState extends State<OTPScreen> {
       }
     } catch (e) {
       this.setState(() {
-        buttonState = ButtonState.error();
+        buttonState = ButtonState.fail;
         Future.delayed(Duration(seconds: 1)).then((value) {
           this.setState(() {
-            buttonState = ButtonState.idle();
+            buttonState = ButtonState.idle;
           });
         });
       });

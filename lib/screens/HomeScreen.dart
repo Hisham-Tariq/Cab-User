@@ -25,7 +25,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // static late final _initialPosition;
   BookingState currentBookingState = BookingState.pickup;
-  late Map<BookingState, dynamic> bookingStateWidgets;
 
   Position? _currentPosition;
   String? _currentAddress;
@@ -35,23 +34,21 @@ class _HomeScreenState extends State<HomeScreen> {
   late GoogleMapController _googleMapController;
   Marker? _pickupMarker;
   String? _pickupAddress;
+  LatLng? _pickupLocation;
+
   Marker? _destinationMarker;
   String? _destinationAddress;
+  LatLng? _destinationLocation;
   Directions? _info;
 
   bool isScheduling = false;
 
   _HomeScreenState() {
-    bookingStateWidgets = {
-      BookingState.pickup: _pickupWidget,
-      BookingState.destination: _destinationWidget,
-    };
+    //  Constructor
   }
 
   @override
   void initState() {
-    // print(FirebaseAuth.instance.currentUser!.phoneNumber);
-    // TODO: implement initState
     super.initState();
     _getCurrentPosition().then((value) {
       this.setState(() {
@@ -182,8 +179,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             this.isScheduling = false;
                           });
                         },
-                        onDestinationSelected: (value) {},
-                        onPickupSelected: (value) {},
+                        onDestinationSelected: (Place place) {
+                          this._destinationLocation = place.location;
+                          this._destinationAddress = place.address;
+                          // this._destinationMarker
+                        },
+                        onPickupSelected: (Place place) {
+                          this._destinationLocation = place.location;
+                        },
                       ),
                     ),
                 ],
@@ -200,34 +203,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  _pickupWidget() {
-    if (_pickupAddress == null) return PickUpWidget(onNext: () {});
-    var lat = _pickupMarker!.position.latitude;
-    var long = _pickupMarker!.position.longitude;
-    return FutureBuilder(
-      future: _getAddressFromLatLng(lat, long),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return PickUpWidget(onNext: () {});
-        } else {
-          return PickUpWidget(
-            onNext: () {},
-            address: snapshot.data as String,
-          );
-        }
-      },
-    );
-    // var address = await _getAddressFromLatLng(
-    //   _pickupMarker!.position.latitude,
-    //   _pickupMarker!.position.longitude,
-    // ) as String;
-    // return
-  }
-
-  _destinationWidget() {
-    return DestinationWidget();
-  }
-
   Future<String?> _getAddressFromLatLng(lat, long) async {
     try {
       List<Placemark> p = await placemarkFromCoordinates(
@@ -235,11 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
         long,
       );
       Placemark place = p[0];
-      print('admin: ${place.administrativeArea}');
-      print('subAdmin: ${place.subAdministrativeArea}');
-      print('locality: ${place.locality}');
-      print('subLocality: ${place.subLocality}');
-      print('street: ${place.street}');
+      // print(place.toJson());
       return "${place.subLocality}, ${place.street}, ${place.locality}";
     } catch (e) {
       print(e);
@@ -293,6 +264,17 @@ class _HomeScreenState extends State<HomeScreen> {
       _pickupMarker = Marker(
         markerId: const MarkerId('pickup'),
         infoWindow: const InfoWindow(title: 'pickup'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
+        position: pos,
+      );
+    });
+  }
+
+  void _addDestinationMarker(LatLng pos) async {
+    this.setState(() {
+      _pickupMarker = Marker(
+        markerId: const MarkerId('destination'),
+        infoWindow: const InfoWindow(title: 'destination'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
         position: pos,
       );
@@ -411,8 +393,8 @@ class _PickupAndDestinationLocationPicker extends StatefulWidget {
   final String currentAddress;
   final LatLng currentLocation;
   final Callback onClose;
-  final void Function(dynamic) onDestinationSelected;
-  final void Function(dynamic) onPickupSelected;
+  final void Function(Place) onDestinationSelected;
+  final void Function(Place) onPickupSelected;
 
   const _PickupAndDestinationLocationPicker({
     Key? key,
@@ -432,6 +414,7 @@ class __PickupAndDestinationLocationPickerState
     extends State<_PickupAndDestinationLocationPicker> {
   bool isDestinationSelected = false;
   final pickupController = TextEditingController();
+  final destinationController = TextEditingController();
   final searchPlaceDebouncer = Debouncer(miliseconds: 300);
   List<Place> places = [];
 
@@ -441,10 +424,7 @@ class __PickupAndDestinationLocationPickerState
     this.pickupController.text = widget.currentAddress;
   }
 
-  __PickupAndDestinationLocationPickerState() {
-    // if (widget.currentAddress == null) print('Yes it is');
-    //
-  }
+  __PickupAndDestinationLocationPickerState() {}
 
   @override
   Widget build(BuildContext context) {
@@ -532,6 +512,15 @@ class __PickupAndDestinationLocationPickerState
                         fontSize: 13.0,
                       ),
                       decoration: InputDecoration(
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              print('Hello');
+                            },
+                            child: Icon(
+                              Icons.map,
+                              color: AppColors.primary,
+                            ),
+                          ),
                           hintText: 'Where to?',
                           hintStyle: TextStyle(
                             color: Colors.grey,
@@ -569,92 +558,53 @@ class __PickupAndDestinationLocationPickerState
             child: ListView.builder(
               itemCount: places.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Container(
-                    height: 30,
-                    width: 30,
-                    child: Icon(
-                      Icons.place,
-                      color: Colors.white,
-                      size: 20.0,
-                    ),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey.shade700,
-                    ),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3.0),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        onTap: () {
+                          if (this.isDestinationSelected) {
+                            destinationController.text = places[index].name;
+                            widget.onDestinationSelected(places[index]);
+                          } else {
+                            pickupController.text = places[index].name;
+                            widget.onPickupSelected(places[index]);
+                          }
+                        },
+                        leading: Container(
+                          height: 25,
+                          width: 25,
+                          child: Icon(
+                            Icons.place,
+                            color: Colors.white,
+                            size: 15.0,
+                          ),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        title: Text(
+                          places[index].name,
+                          style: TextStyle(fontSize: 13.0),
+                        ),
+                        horizontalTitleGap: 1.0,
+                        subtitle: Text(
+                          places[index].address,
+                          style: TextStyle(fontSize: 12.0),
+                        ),
+                      ),
+                      Divider(
+                        height: 0.5,
+                      ),
+                    ],
                   ),
-                  title: Text(places[index].name),
-                  subtitle: Text(places[index].address),
                 );
               },
             ),
           )
         ],
-      ),
-    );
-  }
-}
-
-class _ArrowIcons extends StatelessWidget {
-  _ArrowIcons({Key? key, required this.icon, required this.isActive})
-      : super(key: key);
-  final IconData icon;
-  final bool isActive;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Icon(
-        icon,
-        color: isActive ? Colors.green : Colors.grey.shade400,
-      ),
-      width: 40,
-    );
-  }
-}
-
-class PickUpWidget extends StatelessWidget {
-  final Callback onNext;
-  late TextEditingController pickupController;
-
-  PickUpWidget({Key? key, required this.onNext, String address = ''})
-      : super(key: key) {
-    pickupController = TextEditingController(text: address);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      key: UniqueKey(),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextField(
-            controller: pickupController,
-            enabled: false,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(100.0),
-              ),
-            ),
-          ),
-          VerticalAppSpacer(),
-          FullTextButton(onPressed: onNext, text: 'Confirm Pickup')
-        ],
-      ),
-    );
-  }
-}
-
-class DestinationWidget extends StatelessWidget {
-  const DestinationWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      key: UniqueKey(),
-      color: Colors.orange,
-      child: Center(
-        child: Text('Destination'),
       ),
     );
   }

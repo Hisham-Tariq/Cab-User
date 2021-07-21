@@ -1,4 +1,4 @@
-import 'package:async_button_builder/async_button_builder.dart';
+// import 'package:async_button_builder/async_button_builder.dart';
 import 'package:driving_app_its/controller/controller.dart';
 import 'package:driving_app_its/customization/colors.dart';
 import 'package:driving_app_its/customization/customization.dart';
@@ -10,6 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_state_button/iconed_button.dart';
+import 'package:progress_state_button/progress_button.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 
 class PhoneInputScreen extends StatefulWidget {
@@ -27,7 +29,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   final phoneController = TextEditingController();
   final phoneFocusNode = FocusNode();
 
-  ButtonState buttonState = ButtonState.idle();
+  ButtonState buttonState = ButtonState.idle;
 
   @override
   void initState() {
@@ -84,52 +86,65 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         },
                       ),
                       SizedBox(height: 4),
-                      Center(
-                        child: AsyncAnimatedButton(
-                          stateColors: {
-                            AsyncButtonState.orElse: AppColors.primary,
-                            AsyncButtonState.fail: AppColors.error,
-                          },
-                          stateTexts: {
-                            AsyncButtonState.idle: 'Continue',
-                            AsyncButtonState.success: 'Success',
-                            AsyncButtonState.fail: 'Fail',
-                          },
-                          stateIcons: {
-                            AsyncButtonState.idle: Icons.arrow_right_alt,
-                            AsyncButtonState.success:
-                                Icons.check_circle_outline_rounded,
-                            AsyncButtonState.fail: Icons.cancel_outlined,
-                          },
-                          buttonState: buttonState,
-                          onPressed: verifyPhoneNumber,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: ProgressButton.icon(
+                              iconedButtons: {
+                                ButtonState.idle: IconedButton(
+                                  text: "Continue",
+                                  icon: Icon(Icons.arrow_forward,
+                                      color: Colors.white),
+                                  color: AppColors.primary,
+                                ),
+                                ButtonState.loading: IconedButton(
+                                  text: "Loading",
+                                  color: AppColors.primary,
+                                ),
+                                ButtonState.fail: IconedButton(
+                                  text: "Failed",
+                                  icon: Icon(Icons.cancel, color: Colors.white),
+                                  color: AppColors.error,
+                                ),
+                                ButtonState.success: IconedButton(
+                                  text: "Success",
+                                  icon: Icon(
+                                    Icons.check_circle,
+                                    color: Colors.white,
+                                  ),
+                                  color: AppColors.primary,
+                                )
+                              },
+                              onPressed: verifyPhoneNumber,
+                              state: this.buttonState,
+                              progressIndicator: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      //TODO: Update my Own Animated Button to Create
-                      // The way i wanted
-                      // AnimatedButton(
-                      //   stateButtons: {
-                      //     AnimatedButtonState.idle: FullTextButton(
-                      //       onPressed: () async {
-                      //         if (!_formKey.currentState!.validate()) return;
-                      //         verifyPhoneNumber();
-                      //       },
-                      //       text: 'Continue',
-                      //     ),
-                      //     AnimatedButtonState.loading: Center(
-                      //       child: LoadingButton(),
-                      //     ),
-                      //     AnimatedButtonState.success: FullTextButton(
-                      //       onPressed: () {},
-                      //       text: 'Success',
-                      //     ),
-                      //     AnimatedButtonState.fail: FullTextButton(
-                      //       onPressed: () {},
-                      //       text: 'Fail',
-                      //       buttonColor: Colors.red,
-                      //     ),
-                      //   },
-                      //   currentState: this.buttonState,
+                      // Center(
+                      //   child: AsyncAnimatedButton(
+                      //     stateColors: {
+                      //       AsyncButtonState.orElse: AppColors.primary,
+                      //       AsyncButtonState.fail: AppColors.error,
+                      //     },
+                      //     stateTexts: {
+                      //       AsyncButtonState.idle: 'Continue',
+                      //       AsyncButtonState.success: 'Success',
+                      //       AsyncButtonState.fail: 'Fail',
+                      //     },
+                      //     stateIcons: {
+                      //       AsyncButtonState.idle: Icons.arrow_right_alt,
+                      //       AsyncButtonState.success:
+                      //           Icons.check_circle_outline_rounded,
+                      //       AsyncButtonState.fail: Icons.cancel_outlined,
+                      //     },
+                      //     buttonState: buttonState,
+                      //     onPressed: verifyPhoneNumber,
+                      //   ),
                       // ),
                     ],
                   ),
@@ -144,10 +159,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
   changeButtonToErrorState() {
     this.setState(() {
-      this.buttonState = ButtonState.error();
+      this.buttonState = ButtonState.fail;
       Future.delayed(Duration(seconds: 2)).then((value) {
         this.setState(() {
-          this.buttonState = ButtonState.idle();
+          this.buttonState = ButtonState.idle;
         });
       });
     });
@@ -162,7 +177,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     phoneFocusNode.unfocus();
     if (!_formKey.currentState!.validate()) return;
     this.setState(() {
-      this.buttonState = ButtonState.loading();
+      this.buttonState = ButtonState.loading;
     });
     var phoneNumber = this.formatedPhoneNumber;
     var isExist =
@@ -189,7 +204,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         await auth.signInWithCredential(credential);
 
         this.setState(() {
-          this.buttonState = ButtonState.success();
+          this.buttonState = ButtonState.success;
           Future.delayed(Duration(seconds: 1)).then((value) {
             if (widget.isNewUser)
               Get.to(() => UserInfoGetterScreen());
@@ -201,7 +216,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       codeSent: (String verificationId, int? forceResendingToken) {
         // Called when Code has been sended
         this.setState(() {
-          this.buttonState = ButtonState.success();
+          this.buttonState = ButtonState.success;
           Future.delayed(Duration(seconds: 1)).then((value) {
             Get.to(
               () => OTPScreen(
