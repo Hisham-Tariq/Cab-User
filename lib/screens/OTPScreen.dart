@@ -143,7 +143,9 @@ class _OTPScreenState extends State<OTPScreen> {
                               onPressed: this.verifyOTPCode,
                               state: this.buttonState,
                               progressIndicator: CircularProgressIndicator(
-                                color: Colors.white,
+                                backgroundColor: Colors.white,
+                                valueColor:
+                                    AlwaysStoppedAnimation(Colors.green),
                               ),
                             ),
                           ),

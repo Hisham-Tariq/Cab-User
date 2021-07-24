@@ -119,33 +119,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                               onPressed: verifyPhoneNumber,
                               state: this.buttonState,
                               progressIndicator: CircularProgressIndicator(
-                                color: Colors.white,
+                                backgroundColor: Colors.white,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      // Center(
-                      //   child: AsyncAnimatedButton(
-                      //     stateColors: {
-                      //       AsyncButtonState.orElse: AppColors.primary,
-                      //       AsyncButtonState.fail: AppColors.error,
-                      //     },
-                      //     stateTexts: {
-                      //       AsyncButtonState.idle: 'Continue',
-                      //       AsyncButtonState.success: 'Success',
-                      //       AsyncButtonState.fail: 'Fail',
-                      //     },
-                      //     stateIcons: {
-                      //       AsyncButtonState.idle: Icons.arrow_right_alt,
-                      //       AsyncButtonState.success:
-                      //           Icons.check_circle_outline_rounded,
-                      //       AsyncButtonState.fail: Icons.cancel_outlined,
-                      //     },
-                      //     buttonState: buttonState,
-                      //     onPressed: verifyPhoneNumber,
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
