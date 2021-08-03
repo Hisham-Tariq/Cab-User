@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTextStyle {
+  static final TextStyle normal = GoogleFonts.catamaran(
+    fontSize: 13,
+  );
+
   static final TextStyle appName = GoogleFonts.catamaran(
     fontSize: 28,
     fontWeight: FontWeight.w900,
@@ -19,8 +23,7 @@ class AppTextStyle {
     ),
   );
 
-  static final TextStyle emphasisDescription =
-      AppTextStyle.description.copyWith(
+  static final TextStyle emphasisDescription = AppTextStyle.description.copyWith(
     color: AppColors.emphasis,
     fontWeight: FontWeight.bold,
   );
@@ -33,5 +36,53 @@ class AppTextStyle {
   static final TextStyle outlinedButton = GoogleFonts.catamaran(
     fontWeight: FontWeight.bold,
     color: AppColors.primary,
+  );
+
+  static final TextStyle textField = GoogleFonts.catamaran(
+    fontSize: 13.0,
+  );
+
+  static final TextStyle disabledTextField = GoogleFonts.catamaran(
+    fontSize: 13.0,
+    color: Colors.grey,
+  );
+
+  static final TextStyle textFieldHint = GoogleFonts.catamaran(
+    color: Colors.grey,
+    fontSize: 13.0,
+  );
+
+  static final TextStyle heading1 = GoogleFonts.catamaran(
+    fontWeight: FontWeight.bold,
+    fontSize: 18,
+  );
+
+  static final TextStyle small = GoogleFonts.catamaran(
+    fontSize: 12,
+  );
+
+  static final TextStyle title = GoogleFonts.catamaran(
+    fontSize: 14,
+  );
+
+  static final TextStyle subtitle = GoogleFonts.catamaran(
+    fontSize: 12,
+  );
+
+  static final TextStyle primaryHeading = GoogleFonts.catamaran(
+    fontWeight: FontWeight.bold,
+    color: AppColors.primary,
+    fontSize: 20,
+  );
+
+  static final TextStyle emphasisText = TextStyle(
+    color: AppColors.emphasis,
+    fontWeight: FontWeight.bold,
+  );
+
+  static final TextStyle emphasisTitle = TextStyle(
+    color: AppColors.emphasis,
+    fontSize: 13,
+    fontWeight: FontWeight.bold,
   );
 }

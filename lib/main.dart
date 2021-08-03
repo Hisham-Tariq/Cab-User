@@ -1,4 +1,3 @@
-import 'package:driving_app_its/customization/colors.dart';
 import 'package:driving_app_its/customization/customization.dart';
 import 'package:driving_app_its/screens/screens.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,34 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      theme: ThemeData(
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: Colors.white,
-        textSelectionTheme: TextSelectionThemeData(
-          cursorColor: AppColors.primary,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          contentPadding: EdgeInsets.symmetric(horizontal: 15),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(999.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.primary, width: 2),
-            borderRadius: BorderRadius.circular(999.0),
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            primary: Colors.white,
-            backgroundColor: AppColors.primary,
-            textStyle: AppTextStyle.button,
-            minimumSize: Size(150, 45),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-          ),
-        ),
-      ),
+      theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: SplashScreen(),
@@ -50,8 +22,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-// Theming
-// Primary Color: Colors.green
-// BackgroundColor; Colors.white
-//
-// TODO: Change the Async Button to Progress Button.

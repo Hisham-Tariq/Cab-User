@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
    <application
-        android:label="driving_app_its"
+        android:label="Cab"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

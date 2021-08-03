@@ -115,7 +115,7 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'Email',
+                        'Email (Optional)',
                         style: GoogleFonts.catamaran(
                           color: Colors.black45,
                           fontSize: 14,
@@ -125,9 +125,6 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                       TextFormField(
                         focusNode: emailNode,
                         controller: emailController,
-                        validator: (value) {
-                          return value!.isEmpty ? 'Invalid Value' : null;
-                        },
                       ),
                       SizedBox(height: 4),
                       Center(
@@ -143,8 +140,7 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                           },
                           stateIcons: {
                             AsyncButtonState.idle: Icons.arrow_right_alt,
-                            AsyncButtonState.success:
-                                Icons.check_circle_outline_rounded,
+                            AsyncButtonState.success: Icons.check_circle_outline_rounded,
                             AsyncButtonState.fail: Icons.cancel_outlined,
                           },
                           buttonState: buttonState,

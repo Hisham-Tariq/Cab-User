@@ -9,14 +9,8 @@ class AppName extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Easy',
-          style: AppTextStyle.appName,
-        ),
-        Text(
-          'Drive',
-          style: AppTextStyle.appNamePrimary,
-        ),
+        Text('C', style: AppTextStyle.appNamePrimary),
+        Text('AB', style: AppTextStyle.appName),
       ],
     );
   }

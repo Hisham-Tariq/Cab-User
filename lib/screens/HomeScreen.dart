@@ -1,23 +1,37 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:driving_app_its/controller/controller.dart';
-import 'package:driving_app_its/controller/direction.controller.dart';
-import 'package:driving_app_its/customization/colors.dart';
 import 'package:driving_app_its/customization/customization.dart';
 import 'package:driving_app_its/models/models.dart';
-import 'package:driving_app_its/models/place.model.dart';
-import 'package:driving_app_its/widgets/AppTextButton.dart';
 import 'package:driving_app_its/widgets/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:timelines/timelines.dart';
+//                      TODO:  Current Page Tasks      ✘  or ✔
+//
+// TODO:        Task Name                                              Status
+// TODO:        Make AppStyle Consisten                                  ✘
+// TODO:        Fetch User's Current Location                            ✘
+// TODO:        Show Error (Location Service Not Enabled)                ✘
+// TODO:        Show Error (Location Permission Not given)               ✘
+// TODO:        Learn Position Stream From GeoLocator Pub.dev            ✘
+// TODO:        Fetch Current user Data                                  ✘
 
+// keep track of at what stage of the Trip is.
 enum BookingState { idle, locationByPlace, locationByMap, vehicle, done }
-enum LocationType { pickup, destination }
+// Check weather the user is setting pickup or destination.
+enum LocationEditorType { pickup, destination }
+// Check weather the user want a Rikshaw, Bike or Car
+enum VehicleTypes { rikshaw, bike, car }
+// At What stage of Chosing Vehicle is
+// 1. Main Type such as Rikshaw, Car, or Bike --> VehicleType
+//          or
+// 2. Some Specific Vehicle such as in Bikes it could be Seventy --> SpecificVehicle
+enum ChoseVehicleState { vehicleType, specificVehicle }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -29,10 +43,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // static late final _initialPosition;
   BookingState currentBookingState = BookingState.idle;
-  LocationType currentLocationType = LocationType.pickup;
+  LocationEditorType currentLocationType = LocationEditorType.pickup;
 
   Position? _currentPosition;
-  late String _currentAddress;
   late LatLng _currentCameraCoordinates;
   Debouncer currentCameraPosDebouncer = Debouncer(miliseconds: 200);
 
@@ -65,21 +78,16 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentCameraCoordinates = LatLng(position.latitude, position.longitude);
       _getAddressFromLatLng(position.latitude, position.longitude).then((address) {
         this.setState(() {
-          _currentAddress = address!;
           _pickupLocation = _currentCameraCoordinates;
-          _pickupAddress = address;
+          _pickupAddress = address!;
           _addPickupMarker(_pickupLocation as LatLng);
         });
       });
     });
-    //TODO:  Fetch Current User Data
-    //          OR
-    //TODO:  Create a Current User Controller
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _googleMapController.dispose();
     _placeAnimationController.dispose();
     super.dispose();
@@ -243,16 +251,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           destinationAddress: this._destinationAddress,
                           destinationLocation: this._destinationLocation,
                           onPickupSelected: () {
-                            if (currentLocationType != LocationType.pickup) {
+                            if (currentLocationType != LocationEditorType.pickup) {
                               this.setState(() {
-                                currentLocationType = LocationType.pickup;
+                                currentLocationType = LocationEditorType.pickup;
                               });
                             }
                           },
                           onDestinationSelected: () {
-                            if (currentLocationType != LocationType.destination) {
+                            if (currentLocationType != LocationEditorType.destination) {
                               this.setState(() {
-                                currentLocationType = LocationType.destination;
+                                currentLocationType = LocationEditorType.destination;
                               });
                             }
                           },
@@ -260,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onConfirmLocation: () async {
                             final lat = _currentCameraCoordinates.latitude;
                             final lng = _currentCameraCoordinates.longitude;
-                            if (currentLocationType == LocationType.destination) {
+                            if (currentLocationType == LocationEditorType.destination) {
                               this._destinationLocation = LatLng(lat, lng);
                               this._destinationAddress = await _getAddressFromLatLng(lat, lng);
                               this._addDestinationMarker(this._destinationLocation!);
@@ -279,10 +287,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
+                  if (currentBookingState == BookingState.vehicle)
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: ChoseVehicle(
+                        onBack: () {
+                          this.setState(() {
+                            currentBookingState = BookingState.locationByPlace;
+                          });
+                        },
+                        onVehicleSelected: () {
+                          this.setState(() {
+                            currentBookingState = BookingState.done;
+                          });
+                        },
+                      ),
+                    ),
                   if (currentBookingState == BookingState.done)
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: _BookingDone(
+                        onBack: () {
+                          this.setState(() {
+                            currentBookingState = BookingState.vehicle;
+                          });
+                        },
                         tripInfo: {
                           'distance': this._tripDirections!.totalDistance,
                           'duration': this._tripDirections!.totalDuration,
@@ -311,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     this.setState(() {
-      currentBookingState = BookingState.done;
+      currentBookingState = BookingState.vehicle;
     });
   }
 
@@ -342,7 +371,6 @@ class _HomeScreenState extends State<HomeScreen> {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
-      //TODO: Show a Error to User that You must enable the Location Services
       Get.snackbar('Location Service', 'Device Location services is not enabled. Enable the services to use the app.');
       return Future.error('Location services are disabled.');
     }
@@ -400,12 +428,10 @@ class _ScheduleTripButton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        //TODO: Task Position
         Text(
           'Good Afternoon Test',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+          style: AppTextStyle.heading1,
         ),
         VerticalAppSpacer(),
         GestureDetector(
@@ -427,10 +453,7 @@ class _ScheduleTripButton extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Where to?',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+                    style: AppTextStyle.heading1,
                   ),
                 ),
                 Container(
@@ -443,12 +466,7 @@ class _ScheduleTripButton extends StatelessWidget {
                     ),
                   ),
                   child: Center(
-                    child: Text(
-                      'Schedule',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
+                    child: Text('Schedule', style: AppTextStyle.small),
                   ),
                 ),
               ],
@@ -516,14 +534,12 @@ class _LocationByPlaceState extends State<_LocationByPlace> {
   final destinationController = TextEditingController();
   final searchPlaceDebouncer = Debouncer(miliseconds: 300);
   List<Place> places = [];
-  late final DateTime currentTime;
 
   @override
   void initState() {
     super.initState();
     this.pickupController.text = widget.pickupAddress;
     this.destinationController.text = widget.destinationAddress ?? '';
-    this.currentTime = DateTime.now();
   }
 
   _LocationByPlaceState() {}
@@ -543,20 +559,7 @@ class _LocationByPlaceState extends State<_LocationByPlace> {
               Row(
                 children: [
                   HorizontalAppSpacer(space: 50),
-                  Expanded(
-                    child: TextFormField(
-                      enabled: false,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 13.0,
-                      ),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 30.0),
-                      ),
-                      initialValue: DateFormat.yMMMMEEEEd().add_jm().format(this.currentTime),
-                      // initialValue: 'Sun, 18-July at 12:44 PM',
-                    ),
-                  ),
+                  CurrentTimeField(),
                 ],
               ),
               VerticalAppSpacer(),
@@ -633,17 +636,15 @@ class _LocationByPlaceState extends State<_LocationByPlace> {
                             ),
                             title: Text(
                               places[index].name,
-                              style: TextStyle(fontSize: 13.0),
+                              style: AppTextStyle.title,
                             ),
                             horizontalTitleGap: 1.0,
                             subtitle: Text(
                               places[index].address,
-                              style: TextStyle(fontSize: 12.0),
+                              style: AppTextStyle.subtitle,
                             ),
                           ),
-                          Divider(
-                            height: 0.5,
-                          ),
+                          Divider(height: 0.5),
                         ],
                       ),
                     );
@@ -673,22 +674,17 @@ class _LocationByPlaceState extends State<_LocationByPlace> {
   }) {
     return TextField(
       controller: controller,
-      style: TextStyle(
-        fontSize: 13.0,
-      ),
+      style: AppTextStyle.textField,
       decoration: InputDecoration(
-          suffixIcon: GestureDetector(
-            onTap: onTapOnMap,
-            child: Icon(
-              Icons.map,
-              color: AppColors.primary,
-            ),
+        suffixIcon: GestureDetector(
+          onTap: onTapOnMap,
+          child: Icon(
+            Icons.map,
+            color: AppColors.primary,
           ),
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: Colors.grey,
-            fontSize: 13.0,
-          )),
+        ),
+        hintText: hint,
+      ),
       onTap: onTap,
       onChanged: (value) {
         searchPlaceDebouncer.run(() {
@@ -794,7 +790,7 @@ class _LocationByMap extends StatelessWidget {
                 children: [
                   _addressTextFields(
                       controller: pickupController,
-                      hint: 'From?',
+                      hint: 'Pickup',
                       onTap: () {
                         pickupFocus.unfocus();
                         onPickupSelected();
@@ -803,7 +799,7 @@ class _LocationByMap extends StatelessWidget {
                   VerticalAppSpacer(),
                   _addressTextFields(
                     controller: destinationController,
-                    hint: 'Where to?',
+                    hint: 'Destination',
                     onTap: () {
                       destFocus.unfocus();
                       onDestinationSelected();
@@ -853,24 +849,28 @@ class _LocationByMap extends StatelessWidget {
     return TextField(
       controller: controller,
       focusNode: focus,
-      style: TextStyle(
-        fontSize: 13.0,
-      ),
+      style: AppTextStyle.textField,
       decoration: InputDecoration(
-          hintText: hint,
-          labelText: hint,
-          hintStyle: TextStyle(
-            color: Colors.grey,
-            fontSize: 13.0,
-          )),
+        hintText: hint,
+        labelText: hint,
+      ),
       onTap: onTap,
     );
   }
 }
 
-class _BookingDone extends StatelessWidget {
-  const _BookingDone({Key? key, required this.tripInfo}) : super(key: key);
-  final Map<String, String> tripInfo;
+class ChoseVehicle extends StatefulWidget {
+  const ChoseVehicle({Key? key, required this.onBack, required this.onVehicleSelected}) : super(key: key);
+  final Function onVehicleSelected;
+  final Callback onBack;
+
+  @override
+  _ChoseVehicleState createState() => _ChoseVehicleState();
+}
+
+class _ChoseVehicleState extends State<ChoseVehicle> {
+  ChoseVehicleState vehicleState = ChoseVehicleState.vehicleType;
+  VehicleTypes? currentVehicleType;
 
   @override
   Widget build(BuildContext context) {
@@ -882,13 +882,258 @@ class _BookingDone extends StatelessWidget {
           Positioned(
             left: 8,
             top: 8,
-            child: _BackButton(onTap: () {}),
+            child: _BackButton(onTap: widget.onBack),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12.0),
+                  height: 250,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          if (vehicleState == ChoseVehicleState.specificVehicle)
+                            GestureDetector(
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: AppColors.primary,
+                              ),
+                              onTap: () => this.setState(() {
+                                this.vehicleState = ChoseVehicleState.vehicleType;
+                              }),
+                            ),
+                          Expanded(
+                            child: Center(
+                              child: Text('Chose Vehicle', style: AppTextStyle.primaryHeading),
+                            ),
+                          ),
+                        ],
+                      ),
+                      VerticalAppSpacer(space: 16),
+                      if (vehicleState == ChoseVehicleState.vehicleType) vehicleTypeWidget(),
+                      if (vehicleState == ChoseVehicleState.specificVehicle &&
+                          (currentVehicleType == VehicleTypes.bike))
+                        onChoseBike(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  onChoseBike() {
+    return Column(
+      children: [
+        choseVehicleTile(
+          title: 'Yamaha YBR',
+          onTap: widget.onVehicleSelected,
+          price: 180,
+          vehicleSvg: "assets/svg/motor-sports.svg",
+        ),
+        VerticalAppSpacer(),
+        choseVehicleTile(
+          title: 'Honda Seventy',
+          onTap: widget.onVehicleSelected,
+          price: 120,
+          vehicleSvg: "assets/svg/motor-sports.svg",
+        ),
+      ],
+    );
+  }
+
+  vehicleTypeWidget() {
+    return Column(
+      children: [
+        choseVehicleTypeTile(
+            title: 'Rikshaws',
+            description: 'New Rikshaws with comfortable seats',
+            onTap: () {
+              print('sdhjsd');
+              this.setState(() {
+                this.vehicleState = ChoseVehicleState.specificVehicle;
+                currentVehicleType = VehicleTypes.rikshaw;
+              });
+            },
+            vehicleSvg: "assets/svg/rickshaw.svg"),
+        VerticalAppSpacer(),
+        choseVehicleTypeTile(
+          title: 'Bike',
+          description: 'Affordable rides, All to yourself',
+          onTap: () {
+            this.setState(() {
+              this.vehicleState = ChoseVehicleState.specificVehicle;
+              currentVehicleType = VehicleTypes.bike;
+            });
+          },
+          vehicleSvg: "assets/svg/motor-sports.svg",
+        ),
+      ],
+    );
+  }
+
+  choseVehicleTile({title, onTap, price, vehicleSvg}) {
+    return InkWell(
+      key: UniqueKey(),
+      onTap: onTap,
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.fromBorderSide(
+            BorderSide(
+              color: Colors.grey.withOpacity(0.2),
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 2,
+              offset: Offset(0, 0), // changes position of shadow
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: double.infinity,
+              padding: EdgeInsets.all(12.0),
+              child: SvgPicture.asset(vehicleSvg, height: 32),
+            ),
+            VerticalDivider(width: 0.0),
+            HorizontalAppSpacer(space: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyle.emphasisText,
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 80,
+              height: double.infinity,
+              child: Center(
+                child: Text(
+                  'Rs.$price',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  choseVehicleTypeTile({title, description, onTap, vehicleSvg}) {
+    return InkWell(
+      key: UniqueKey(),
+      onTap: onTap,
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.fromBorderSide(
+            BorderSide(
+              color: Colors.grey.withOpacity(0.2),
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 2,
+              offset: Offset(0, 0), // changes position of shadow
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: double.infinity,
+              padding: EdgeInsets.all(12.0),
+              // color: Colors.grey.shade400,
+              child: SvgPicture.asset(
+                vehicleSvg,
+              ),
+            ),
+            VerticalDivider(width: 0.0),
+            HorizontalAppSpacer(space: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(title, style: AppTextStyle.emphasisText),
+                  Text(description, style: AppTextStyle.description),
+                ],
+              ),
+            ),
+            Container(
+              width: 40,
+              height: double.infinity,
+              child: Icon(
+                Icons.arrow_right,
+                size: 24,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BookingDone extends StatelessWidget {
+  const _BookingDone({Key? key, required this.tripInfo, required this.onBack}) : super(key: key);
+  final Map<String, String> tripInfo;
+  final Callback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: double.infinity,
+      width: double.infinity,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 8,
+            top: 8,
+            child: _BackButton(onTap: onBack),
           ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               padding: EdgeInsets.all(12.0),
-              height: 250,
+              height: 300,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -900,84 +1145,45 @@ class _BookingDone extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Trip Detail',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  Center(
+                    child: Text('Trip Detail', style: AppTextStyle.primaryHeading),
                   ),
-                  VerticalAppSpacer(space: 24),
+                  VerticalAppSpacer(space: 16),
                   Row(
                     children: [
-                      Text(
-                        'Pickup: ',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text('Pickup: ', style: AppTextStyle.emphasisTitle),
                       HorizontalAppSpacer(),
-                      Text(
-                        tripInfo['pickup'] as String,
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      Text(tripInfo['pickup'] as String, style: AppTextStyle.normal),
+                    ],
+                  ),
+                  VerticalAppSpacer(),
+                  Row(
+                    children: [
+                      Text('Destination: ', style: AppTextStyle.emphasisTitle),
+                      HorizontalAppSpacer(),
+                      Expanded(
+                        child: Container(
+                          child: SingleChildScrollView(
+                            child: Text(tripInfo['destination'] as String, style: AppTextStyle.normal),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                   VerticalAppSpacer(),
                   Row(
                     children: [
-                      Text(
-                        'Destination: ',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text('Distance: ', style: AppTextStyle.emphasisTitle),
                       HorizontalAppSpacer(),
-                      Text(
-                        tripInfo['destination'] as String,
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
-                      ),
+                      Text(tripInfo['distance'] as String, style: AppTextStyle.normal),
                     ],
                   ),
                   VerticalAppSpacer(),
                   Row(
                     children: [
-                      Text(
-                        'Distance: ',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text('Duration: ', style: AppTextStyle.emphasisTitle),
                       HorizontalAppSpacer(),
-                      Text(
-                        tripInfo['distance'] as String,
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  VerticalAppSpacer(),
-                  Row(
-                    children: [
-                      Text(
-                        'Duration: ',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      HorizontalAppSpacer(),
-                      Text(
-                        tripInfo['duration'] as String,
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
-                      ),
+                      Text(tripInfo['duration'] as String, style: AppTextStyle.normal),
                     ],
                   ),
                   Expanded(child: Container()),
@@ -991,14 +1197,6 @@ class _BookingDone extends StatelessWidget {
     );
   }
 }
-
-//                      TODO:  Current Page Tasks      ✘  or ✔
-//
-// TODO:        Task Name                                              Status
-// TODO:        Fetch User's Current Location                            ✘
-// TODO:        Show Error (Location Service Not Enabled)                ✘
-// TODO:        Show Error (Location Permission Not given)               ✘
-// TODO:        Learn Position Stream From GeoLocator Pub.dev            ✘
 
 // Steps
 // 1 -> Idle
