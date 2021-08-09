@@ -2,7 +2,7 @@
 import 'package:driving_app_its/controller/controller.dart';
 import 'package:driving_app_its/customization/colors.dart';
 import 'package:driving_app_its/customization/customization.dart';
-import 'package:driving_app_its/screens/HomeScreen.dart';
+import 'package:driving_app_its/screens/HomeScreen/HomeScreen.dart';
 import 'package:driving_app_its/screens/OTPScreen.dart';
 import 'package:driving_app_its/screens/UserInfoGetterScreen.dart';
 import 'package:driving_app_its/widgets/widgets.dart';

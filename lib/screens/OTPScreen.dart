@@ -1,6 +1,6 @@
 // import 'package:async_button_builder/async_button_builder.dart';
 import 'package:driving_app_its/customization/customization.dart';
-import 'package:driving_app_its/screens/HomeScreen.dart';
+import 'package:driving_app_its/screens/HomeScreen/HomeScreen.dart';
 import 'package:driving_app_its/screens/UserInfoGetterScreen.dart';
 import 'package:driving_app_its/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';

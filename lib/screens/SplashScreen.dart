@@ -1,5 +1,5 @@
 import 'package:driving_app_its/controller/controller.dart';
-import 'package:driving_app_its/screens/HomeScreen.dart';
+import 'package:driving_app_its/screens/HomeScreen/HomeScreen.dart';
 import 'package:driving_app_its/screens/IntroScreen.dart';
 import 'package:driving_app_its/screens/screens.dart';
 import 'package:driving_app_its/widgets/AppName.dart';
@@ -35,7 +35,10 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         controller = Get.put<UserController>(UserController());
       }
-      controller.userWithPhoneNumberIsExist(FirebaseAuth.instance.currentUser!.phoneNumber as String).then((value) {
+      controller
+          .userWithPhoneNumberIsExist(
+              FirebaseAuth.instance.currentUser!.phoneNumber as String)
+          .then((value) {
         if (value) {
           // All things are clear Navigate to [HomeScreen]
           Get.off(() => HomeScreen());

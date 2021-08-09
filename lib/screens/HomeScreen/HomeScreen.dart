@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driving_app_its/controller/controller.dart';
 import 'package:driving_app_its/customization/customization.dart';
 import 'package:driving_app_its/models/models.dart';
@@ -11,6 +12,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:timelines/timelines.dart';
+
+import '../../utils.dart';
 //                      TODO:  Current Page Tasks      ✘  or ✔
 //
 // TODO:        Task Name                                              Status
@@ -22,7 +25,7 @@ import 'package:timelines/timelines.dart';
 // TODO:        Fetch Current user Data                                  ✘
 
 // keep track of at what stage of the Trip is.
-enum BookingState { idle, locationByPlace, locationByMap, vehicle, done }
+enum BookingState { idle, locationByPlace, locationByMap, vehicle, rider, done }
 // Check weather the user is setting pickup or destination.
 enum LocationEditorType { pickup, destination }
 // Check weather the user want a Rikshaw, Bike or Car
@@ -65,9 +68,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool isScheduling = false;
 
-  _HomeScreenState() {
-    //  Constructor
-  }
+  Set<Marker>? availableRidersMarkers;
+  List<dynamic>? availableRiders;
 
   @override
   void initState() {
@@ -76,7 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _getCurrentPosition().then((position) {
       this._currentPosition = position;
       _currentCameraCoordinates = LatLng(position.latitude, position.longitude);
-      _getAddressFromLatLng(position.latitude, position.longitude).then((address) {
+      _getAddressFromLatLng(position.latitude, position.longitude)
+          .then((address) {
         this.setState(() {
           _pickupLocation = _currentCameraCoordinates;
           _pickupAddress = address!;
@@ -116,10 +119,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       zoom: 11.5,
                     ),
-                    onMapCreated: (controller) => _googleMapController = controller,
+                    onMapCreated: (controller) =>
+                        _googleMapController = controller,
                     markers: {
                       _pickupMarker,
-                      if (_destinationMarker != null) _destinationMarker as Marker,
+                      if (_destinationMarker != null)
+                        _destinationMarker as Marker,
+                      if (availableRidersMarkers != null)
+                        ...availableRidersMarkers!,
                     },
                     polylines: {
                       if (_tripDirections != null)
@@ -127,7 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           polylineId: const PolylineId('overview_polyline'),
                           color: Colors.red,
                           width: 5,
-                          points: _tripDirections!.polylinePoints.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+                          points: _tripDirections!.polylinePoints
+                              .map((e) => LatLng(e.latitude, e.longitude))
+                              .toList(),
                         ),
                     },
                     onCameraMove: (position) {
@@ -171,7 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: _ScheduleTripButton(
                             onSchedule: () {
                               this.setState(() {
-                                this.currentBookingState = BookingState.locationByPlace;
+                                this.currentBookingState =
+                                    BookingState.locationByPlace;
                                 this.isScheduling = true;
                               });
                             },
@@ -179,7 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                  if (this.isScheduling && currentBookingState == BookingState.locationByPlace)
+                  if (this.isScheduling &&
+                      currentBookingState == BookingState.locationByPlace)
                     Positioned(
                       child: ElasticIn(
                         duration: Duration(milliseconds: 200),
@@ -200,7 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onLocationByMap: () {
                             _placeAnimationController.reverse().then((value) {
                               this.setState(() {
-                                this.currentBookingState = BookingState.locationByMap;
+                                this.currentBookingState =
+                                    BookingState.locationByMap;
                               });
                             });
                           },
@@ -209,8 +221,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             this._destinationAddress = place.address;
                             _addDestinationMarker(place.location);
 
-                            final directions = await DirectionsController().getDirections(
-                                origin: _pickupMarker.position, destination: _destinationMarker!.position);
+                            final directions = await DirectionsController()
+                                .getDirections(
+                                    origin: _pickupMarker.position,
+                                    destination: _destinationMarker!.position);
                             _tripDirections = directions;
 
                             // this._destinationMarker
@@ -220,8 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             this._pickupAddress = place.address;
                             _addPickupMarker(place.location);
                             if (_destinationMarker != null) {
-                              final directions = await DirectionsController().getDirections(
-                                  origin: _pickupMarker.position, destination: _destinationMarker!.position);
+                              final directions = await DirectionsController()
+                                  .getDirections(
+                                      origin: _pickupMarker.position,
+                                      destination:
+                                          _destinationMarker!.position);
                               _tripDirections = directions;
                             }
                           },
@@ -242,7 +259,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onBack: () {
                             _mapAnimationController.reverse().then((value) {
                               this.setState(() {
-                                currentBookingState = BookingState.locationByPlace;
+                                currentBookingState =
+                                    BookingState.locationByPlace;
                               });
                             });
                           },
@@ -251,16 +269,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           destinationAddress: this._destinationAddress,
                           destinationLocation: this._destinationLocation,
                           onPickupSelected: () {
-                            if (currentLocationType != LocationEditorType.pickup) {
+                            if (currentLocationType !=
+                                LocationEditorType.pickup) {
                               this.setState(() {
                                 currentLocationType = LocationEditorType.pickup;
                               });
                             }
                           },
                           onDestinationSelected: () {
-                            if (currentLocationType != LocationEditorType.destination) {
+                            if (currentLocationType !=
+                                LocationEditorType.destination) {
                               this.setState(() {
-                                currentLocationType = LocationEditorType.destination;
+                                currentLocationType =
+                                    LocationEditorType.destination;
                               });
                             }
                           },
@@ -268,18 +289,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           onConfirmLocation: () async {
                             final lat = _currentCameraCoordinates.latitude;
                             final lng = _currentCameraCoordinates.longitude;
-                            if (currentLocationType == LocationEditorType.destination) {
+                            if (currentLocationType ==
+                                LocationEditorType.destination) {
                               this._destinationLocation = LatLng(lat, lng);
-                              this._destinationAddress = await _getAddressFromLatLng(lat, lng);
-                              this._addDestinationMarker(this._destinationLocation!);
+                              this._destinationAddress =
+                                  await _getAddressFromLatLng(lat, lng);
+                              this._addDestinationMarker(
+                                  this._destinationLocation!);
                             } else {
                               this._pickupLocation = LatLng(lat, lng);
-                              this._pickupAddress = await _getAddressFromLatLng(lat, lng) as String;
+                              this._pickupAddress =
+                                  await _getAddressFromLatLng(lat, lng)
+                                      as String;
                               this._addPickupMarker(this._pickupLocation);
                             }
                             if (_destinationMarker != null) {
-                              final directions = await DirectionsController().getDirections(
-                                  origin: _pickupMarker.position, destination: _destinationMarker!.position);
+                              final directions = await DirectionsController()
+                                  .getDirections(
+                                      origin: _pickupMarker.position,
+                                      destination:
+                                          _destinationMarker!.position);
                               _tripDirections = directions;
                             }
                             this.setState(() {});
@@ -298,10 +327,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         onVehicleSelected: () {
                           this.setState(() {
-                            currentBookingState = BookingState.done;
+                            currentBookingState = BookingState.rider;
+                            findNearbyRiders();
                           });
                         },
                       ),
+                    ),
+                  if (currentBookingState == BookingState.rider)
+                    Positioned(
+                      left: 8,
+                      top: 8,
+                      child: _BackButton(onTap: () {
+                        this.setState(() {
+                          currentBookingState = BookingState.vehicle;
+                        });
+                      }),
                     ),
                   if (currentBookingState == BookingState.done)
                     Align(
@@ -309,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: _BookingDone(
                         onBack: () {
                           this.setState(() {
-                            currentBookingState = BookingState.vehicle;
+                            currentBookingState = BookingState.rider;
                           });
                         },
                         tripInfo: {
@@ -371,7 +411,8 @@ class _HomeScreenState extends State<HomeScreen> {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
-      Get.snackbar('Location Service', 'Device Location services is not enabled. Enable the services to use the app.');
+      Get.snackbar('Location Service',
+          'Device Location services is not enabled. Enable the services to use the app.');
       return Future.error('Location services are disabled.');
     }
 
@@ -392,7 +433,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     // When we reach here, permissions are granted and we can
@@ -417,10 +459,47 @@ class _HomeScreenState extends State<HomeScreen> {
       position: pos,
     );
   }
+
+  findNearbyRiders() async {
+    var id = getRandomString(20);
+    print('Rider');
+    await FirebaseFirestore.instance.collection('needRider').doc(id).set({
+      'lat': _pickupLocation.latitude.toString(),
+      'lng': _pickupLocation.longitude.toString(),
+    });
+    FirebaseFirestore.instance
+        .collection('availableRiders')
+        .doc(id)
+        .collection('riders')
+        .snapshots()
+        .listen((event) {
+      availableRiders = event.docs;
+      print(event.docChanges.length);
+      if (event.docChanges.length > 0) {
+        print(event.docChanges.first.doc.data()!['lat']);
+      }
+      List<Marker> markers = [];
+      event.docs.forEach((e) {
+        var marker = Marker(
+          markerId: MarkerId(getRandomString(10)),
+          infoWindow: const InfoWindow(title: 'Rider'),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          position: LatLng(e.data()['lat'], e.data()['lng']),
+        );
+        markers.add(marker);
+      });
+      this.setState(() {
+        availableRidersMarkers = markers.toSet();
+        print(availableRidersMarkers!.length);
+      });
+    });
+  }
 }
 
 class _ScheduleTripButton extends StatelessWidget {
-  const _ScheduleTripButton({Key? key, required this.onSchedule}) : super(key: key);
+  const _ScheduleTripButton({Key? key, required this.onSchedule})
+      : super(key: key);
   final Callback onSchedule;
 
   @override
@@ -860,7 +939,9 @@ class _LocationByMap extends StatelessWidget {
 }
 
 class ChoseVehicle extends StatefulWidget {
-  const ChoseVehicle({Key? key, required this.onBack, required this.onVehicleSelected}) : super(key: key);
+  const ChoseVehicle(
+      {Key? key, required this.onBack, required this.onVehicleSelected})
+      : super(key: key);
   final Function onVehicleSelected;
   final Callback onBack;
 
@@ -895,7 +976,9 @@ class _ChoseVehicleState extends State<ChoseVehicle> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -909,18 +992,21 @@ class _ChoseVehicleState extends State<ChoseVehicle> {
                                 color: AppColors.primary,
                               ),
                               onTap: () => this.setState(() {
-                                this.vehicleState = ChoseVehicleState.vehicleType;
+                                this.vehicleState =
+                                    ChoseVehicleState.vehicleType;
                               }),
                             ),
                           Expanded(
                             child: Center(
-                              child: Text('Chose Vehicle', style: AppTextStyle.primaryHeading),
+                              child: Text('Chose Vehicle',
+                                  style: AppTextStyle.primaryHeading),
                             ),
                           ),
                         ],
                       ),
                       VerticalAppSpacer(space: 16),
-                      if (vehicleState == ChoseVehicleState.vehicleType) vehicleTypeWidget(),
+                      if (vehicleState == ChoseVehicleState.vehicleType)
+                        vehicleTypeWidget(),
                       if (vehicleState == ChoseVehicleState.specificVehicle &&
                           (currentVehicleType == VehicleTypes.bike))
                         onChoseBike(),
@@ -1113,7 +1199,8 @@ class _ChoseVehicleState extends State<ChoseVehicle> {
 }
 
 class _BookingDone extends StatelessWidget {
-  const _BookingDone({Key? key, required this.tripInfo, required this.onBack}) : super(key: key);
+  const _BookingDone({Key? key, required this.tripInfo, required this.onBack})
+      : super(key: key);
   final Map<String, String> tripInfo;
   final Callback onBack;
 
@@ -1146,14 +1233,16 @@ class _BookingDone extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child: Text('Trip Detail', style: AppTextStyle.primaryHeading),
+                    child:
+                        Text('Trip Detail', style: AppTextStyle.primaryHeading),
                   ),
                   VerticalAppSpacer(space: 16),
                   Row(
                     children: [
                       Text('Pickup: ', style: AppTextStyle.emphasisTitle),
                       HorizontalAppSpacer(),
-                      Text(tripInfo['pickup'] as String, style: AppTextStyle.normal),
+                      Text(tripInfo['pickup'] as String,
+                          style: AppTextStyle.normal),
                     ],
                   ),
                   VerticalAppSpacer(),
@@ -1164,7 +1253,8 @@ class _BookingDone extends StatelessWidget {
                       Expanded(
                         child: Container(
                           child: SingleChildScrollView(
-                            child: Text(tripInfo['destination'] as String, style: AppTextStyle.normal),
+                            child: Text(tripInfo['destination'] as String,
+                                style: AppTextStyle.normal),
                           ),
                         ),
                       ),
@@ -1175,7 +1265,8 @@ class _BookingDone extends StatelessWidget {
                     children: [
                       Text('Distance: ', style: AppTextStyle.emphasisTitle),
                       HorizontalAppSpacer(),
-                      Text(tripInfo['distance'] as String, style: AppTextStyle.normal),
+                      Text(tripInfo['distance'] as String,
+                          style: AppTextStyle.normal),
                     ],
                   ),
                   VerticalAppSpacer(),
@@ -1183,7 +1274,8 @@ class _BookingDone extends StatelessWidget {
                     children: [
                       Text('Duration: ', style: AppTextStyle.emphasisTitle),
                       HorizontalAppSpacer(),
-                      Text(tripInfo['duration'] as String, style: AppTextStyle.normal),
+                      Text(tripInfo['duration'] as String,
+                          style: AppTextStyle.normal),
                     ],
                   ),
                   Expanded(child: Container()),
