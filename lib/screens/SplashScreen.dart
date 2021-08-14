@@ -19,7 +19,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    FirebaseAuth.instance.signOut();
     if (FirebaseAuth.instance.currentUser == null) {
       print('null');
       // User is Not Authenticated

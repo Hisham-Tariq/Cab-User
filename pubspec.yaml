@@ -25,19 +25,19 @@ dependencies:
     sdk: flutter
 
   # Dependency for State management
-  get: ^4.1.4
+  get: ^4.3.6
   # Dependency for Fonts
   google_fonts: ^2.1.0
   # Base For All Firebase Services
-  firebase_core: ^1.3.0
+  firebase_core: ^1.4.0
   # Dependency For firebase Auth
-  firebase_auth: ^2.0.0
+  firebase_auth: ^3.0.1
   # Dependency For Firestore Database
-  cloud_firestore: ^2.3.0
+  cloud_firestore: ^2.4.0
   # UI
   async_button_builder: ^2.1.3+1
   #  For Auto Verification of OTP
-  sms_autofill: ^2.0.0
+  sms_autofill: ^2.0.1
   # Used to Fetch distance between two points
   dio: ^4.0.0
   # Dependency For Drawing path between two co-ordinates
@@ -45,19 +45,20 @@ dependencies:
   # Dependency For GOogle mPas
   google_maps_flutter: ^2.0.6
   # Dependency for Finding Current Loc + Places
-  geolocator: ^7.3.0
+  geolocator: ^7.4.0
   geocoding: ^2.0.0
   animate_do: ^2.0.0
   timelines: ^0.1.0
   progress_state_button: ^1.0.3
   intl: ^0.17.0
   flutter_svg: ^0.22.0
-
+  cloud_functions: ^3.0.0
+  firebase_messaging: ^10.0.4
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.3
 
 dev_dependencies:
   flutter_test:
