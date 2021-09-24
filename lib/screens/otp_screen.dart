@@ -1,28 +1,30 @@
-// import 'package:async_button_builder/async_button_builder.dart';
-import 'package:driving_app_its/customization/customization.dart';
-import 'package:driving_app_its/screens/HomeScreen/HomeScreen.dart';
-import 'package:driving_app_its/screens/UserInfoGetterScreen.dart';
-import 'package:driving_app_its/widgets/widgets.dart';
+import '../controller/controller.dart';
+import '../customization/customization.dart';
+// import '../screens/NewTripBooking/new_trip_booking_screen.dart';
+// import '../screens/user_info_getter_screen.dart';
+import '../widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
-import 'package:sms_autofill/sms_autofill.dart';
+import '../routes/paths.dart';
 
 class OTPScreen extends StatefulWidget {
-  final String verificationId;
-  final int? forceResendingToken;
-  final bool isNewUser;
+  late final String verificationId;
+  late final int? forceResendingToken;
+  late final bool isNewUser;
 
   OTPScreen({
     Key? key,
-    required this.verificationId,
-    this.forceResendingToken,
-    this.isNewUser = true,
-  }) : super(key: key);
+  }) : super(key: key) {
+    print(Get.arguments);
+    verificationId = Get.arguments['verificationId'];
+    isNewUser = Get.arguments['isNewUser'];
+    forceResendingToken = Get.arguments['forceResendingToken'];
+    // print(this.verificationId);
+  }
 
   @override
   _OTPScreenState createState() => _OTPScreenState();
@@ -36,36 +38,23 @@ class _OTPScreenState extends State<OTPScreen> {
   ButtonState buttonState = ButtonState.idle;
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    SmsAutoFill().listenForCode;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: 120),
-                AppName(),
-                AppTagLine(),
-                SizedBox(height: 100),
+                const SizedBox(height: 120),
+                const AppName(),
+                const AppTagLine(),
+                const SizedBox(height: 100),
                 Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //TODO: Add LabelStyle in TextStyle File
                       Text(
                         'OTP Code',
                         style: GoogleFonts.catamaran(
@@ -73,10 +62,9 @@ class _OTPScreenState extends State<OTPScreen> {
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 4),
-                      TextFieldPinAutoFill(
-                        codeLength: 6,
-                        onCodeChanged: (value) {
+                      const SizedBox(height: 4),
+                      TextField(
+                        onChanged: (value) {
                           print(value);
                           // print(otpController.text);
                           otpCode = value;
@@ -88,34 +76,13 @@ class _OTPScreenState extends State<OTPScreen> {
                           }
                         },
                       ),
-                      SizedBox(height: 4),
-                      // Center(
-                      //   child: AsyncAnimatedButton(
-                      //     stateColors: {
-                      //       AsyncButtonState.orElse: AppColors.primary,
-                      //       AsyncButtonState.fail: Colors.red,
-                      //     },
-                      //     stateTexts: {
-                      //       AsyncButtonState.idle: 'Verify',
-                      //       AsyncButtonState.success: 'Success',
-                      //       AsyncButtonState.fail: 'Fail',
-                      //     },
-                      //     stateIcons: {
-                      //       AsyncButtonState.idle: Icons.arrow_right_alt,
-                      //       AsyncButtonState.success:
-                      //           Icons.check_circle_outline_rounded,
-                      //       AsyncButtonState.fail: Icons.cancel_outlined,
-                      //     },
-                      //     buttonState: buttonState,
-                      //     onPressed: verifyOTPCode,
-                      //   ),
-                      // ),
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Expanded(
                             child: ProgressButton.icon(
-                              iconedButtons: {
+                              iconedButtons: const {
                                 ButtonState.idle: IconedButton(
                                   text: "Verify",
                                   icon: Icon(Icons.arrow_forward,
@@ -140,9 +107,10 @@ class _OTPScreenState extends State<OTPScreen> {
                                   color: AppColors.primary,
                                 )
                               },
-                              onPressed: this.verifyOTPCode,
-                              state: this.buttonState,
-                              progressIndicator: CircularProgressIndicator(
+                              onPressed: verifyOTPCode,
+                              state: buttonState,
+                              progressIndicator:
+                                  const CircularProgressIndicator(
                                 backgroundColor: Colors.white,
                                 valueColor:
                                     AlwaysStoppedAnimation(Colors.green),
@@ -162,9 +130,19 @@ class _OTPScreenState extends State<OTPScreen> {
     );
   }
 
+  _onSuccessfullyAuth() {
+    if (widget.isNewUser) {
+      Get.offAllNamed(AppPaths.userInfo);
+    } else {
+      var controller = Get.find<UserController>();
+      controller
+          .readCurrentUser()
+          .then((_) => Get.offAllNamed(AppPaths.tripBooking));
+    }
+  }
+
   Future<void> verifyOTPCode() async {
-    // if (!_formKey.currentState!.validate()) return;
-    this.setState(() {
+    setState(() {
       buttonState = ButtonState.loading;
     });
     // var otpCode = otpController.text;
@@ -179,22 +157,30 @@ class _OTPScreenState extends State<OTPScreen> {
     // Sign the user in (or link) with the credential
     try {
       await auth.signInWithCredential(credential);
-      this.setState(() {
+      setState(() {
         buttonState = ButtonState.success;
       });
-      await Future.delayed(Duration(seconds: 1));
-      // Remove the Listen to OTP Code
-      await SmsAutoFill().unregisterListener();
-      if (widget.isNewUser) {
-        Get.to(() => UserInfoGetterScreen());
-      } else {
-        Get.off(() => HomeScreen());
-      }
+      await Future.delayed(const Duration(seconds: 1));
+      _onSuccessfullyAuth();
     } catch (e) {
-      this.setState(() {
+      if (FirebaseAuth.instance.currentUser != null) {
+        _onSuccessfullyAuth();
+      } else {
+        print('Error: $e');
+        Get.snackbar('Error', '$e');
+        setState(() {
+          buttonState = ButtonState.fail;
+          Future.delayed(const Duration(seconds: 1)).then((value) {
+            setState(() {
+              buttonState = ButtonState.idle;
+            });
+          });
+        });
+      }
+      setState(() {
         buttonState = ButtonState.fail;
-        Future.delayed(Duration(seconds: 1)).then((value) {
-          this.setState(() {
+        Future.delayed(const Duration(seconds: 1)).then((value) {
+          setState(() {
             buttonState = ButtonState.idle;
           });
         });

@@ -1,39 +1,39 @@
-import 'package:driving_app_its/screens/PhoneInputScreen.dart';
-import 'package:driving_app_its/widgets/widgets.dart';
+import '../widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../customization/customization.dart';
+import '../routes/paths.dart';
 
 class IntroScreen extends StatelessWidget {
+  const IntroScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Material(
+    return Material(
+      child: SafeArea(
         child: Container(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: Center(
             child: Column(
               children: [
-                SizedBox(height: 120),
-                AppName(),
-                AppTagLine(),
-                SizedBox(height: 100),
+                const SizedBox(height: 120),
+                const AppName(),
+                const AppTagLine(),
+                const SizedBox(height: 100),
                 // SignIn Button
                 FullTextButton(
-                  onPressed: () =>
-                      Get.to(() => PhoneInputScreen(isNewUser: false)),
+                  onPressed: () => Get.toNamed(AppPaths.login),
                   text: 'Login',
                 ),
                 // SignUp Button
-                SizedBox(
+                const SizedBox(
                   height: 4,
                 ),
                 FullOutlinedTextButton(
-                  onPressed: () => Get.to(() => PhoneInputScreen()),
+                  onPressed: () => Get.toNamed(AppPaths.signup),
                   text: 'Register',
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'By choosing one or the other, you are agreeing to the',
                   style: AppTextStyle.description,
@@ -73,9 +73,3 @@ class IntroScreen extends StatelessWidget {
     );
   }
 }
-
-//                      TODO:  Current Page Tasks      ✘  or ✔
-//
-// TODO:        Task Name                                              Status
-// TODO:        Add Terms & Services                                     ✘
-// TODO:        Add Privacy Policy                                       ✘

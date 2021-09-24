@@ -1,12 +1,13 @@
-import 'package:async_button_builder/async_button_builder.dart';
-import 'package:driving_app_its/controller/controller.dart';
-import 'package:driving_app_its/customization/customization.dart';
-import 'package:driving_app_its/models/models.dart';
-import 'package:driving_app_its/screens/screens.dart';
-import 'package:driving_app_its/widgets/widgets.dart';
+import '../controller/controller.dart';
+import '../customization/customization.dart';
+import '../models/models.dart';
+import '../widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_state_button/iconed_button.dart';
+import 'package:progress_state_button/progress_button.dart';
+import '../routes/paths.dart';
 
 class UserInfoGetterScreen extends StatefulWidget {
   @override
@@ -26,56 +27,28 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
   final emailController = TextEditingController();
   final emailNode = FocusNode();
 
-  ButtonState buttonState = ButtonState.idle();
+  ButtonState buttonState = ButtonState.idle;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (!Get.isRegistered<UserController>())
-      this._userController = Get.put(UserController());
-    else
-      this._userController = Get.find<UserController>();
+    _userController = Get.find<UserController>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: 50),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Easy',
-                      style: GoogleFonts.catamaran(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    Text(
-                      'Drive',
-                      style: GoogleFonts.catamaran(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Designed for living in a better world.',
-                  style: GoogleFonts.catamaran(
-                    color: Colors.black45,
-                    fontSize: 11,
-                  ),
-                ),
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
+                const AppName(),
+                const AppTagLine(),
+                const SizedBox(height: 50),
                 Form(
                   key: _formKey,
                   child: Column(
@@ -88,7 +61,7 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       TextFormField(
                         controller: firstNameController,
                         focusNode: firstNameNode,
@@ -96,7 +69,7 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                           return value!.isEmpty ? 'Invalid Value' : null;
                         },
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       // Password
                       Text(
                         'Last Name',
@@ -105,7 +78,7 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       TextFormField(
                         controller: lastNameController,
                         focusNode: lastNameNode,
@@ -113,7 +86,7 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                           return value!.isEmpty ? 'Invalid Value' : null;
                         },
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Email (Optional)',
                         style: GoogleFonts.catamaran(
@@ -121,31 +94,53 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       TextFormField(
                         focusNode: emailNode,
                         controller: emailController,
                       ),
-                      SizedBox(height: 4),
-                      Center(
-                        child: AsyncAnimatedButton(
-                          stateColors: {
-                            AsyncButtonState.orElse: AppColors.primary,
-                            AsyncButtonState.fail: Colors.red,
-                          },
-                          stateTexts: {
-                            AsyncButtonState.idle: 'Continue',
-                            AsyncButtonState.success: 'Success',
-                            AsyncButtonState.fail: 'Fail',
-                          },
-                          stateIcons: {
-                            AsyncButtonState.idle: Icons.arrow_right_alt,
-                            AsyncButtonState.success: Icons.check_circle_outline_rounded,
-                            AsyncButtonState.fail: Icons.cancel_outlined,
-                          },
-                          buttonState: buttonState,
-                          onPressed: handleAddUserData,
-                        ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: ProgressButton.icon(
+                              iconedButtons: const {
+                                ButtonState.idle: IconedButton(
+                                  text: "Continue",
+                                  icon: Icon(Icons.arrow_forward,
+                                      color: Colors.white),
+                                  color: AppColors.primary,
+                                ),
+                                ButtonState.loading: IconedButton(
+                                  text: "Loading",
+                                  color: AppColors.primary,
+                                ),
+                                ButtonState.fail: IconedButton(
+                                  text: "Failed",
+                                  icon: Icon(Icons.cancel, color: Colors.white),
+                                  color: AppColors.error,
+                                ),
+                                ButtonState.success: IconedButton(
+                                  text: "Success",
+                                  icon: Icon(
+                                    Icons.check_circle,
+                                    color: Colors.white,
+                                  ),
+                                  color: AppColors.primary,
+                                )
+                              },
+                              onPressed: handleAddUserData,
+                              state: buttonState,
+                              progressIndicator:
+                                  const CircularProgressIndicator(
+                                backgroundColor: Colors.white,
+                                valueColor:
+                                    AlwaysStoppedAnimation(Colors.green),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -159,11 +154,11 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
   }
 
   changeButtonStateToError() {
-    this.setState(() {
-      buttonState = ButtonState.error();
-      Future.delayed(Duration(seconds: 1)).then((value) {
-        this.setState(() {
-          buttonState = ButtonState.idle();
+    setState(() {
+      buttonState = ButtonState.fail;
+      Future.delayed(const Duration(seconds: 1)).then((value) {
+        setState(() {
+          buttonState = ButtonState.idle;
         });
       });
     });
@@ -177,29 +172,29 @@ class _UserInfoGetterScreenState extends State<UserInfoGetterScreen> {
 
   Future<void> handleAddUserData() async {
     // Remove Focus From Fields on Tap
-    this.unFocusFields();
+    unFocusFields();
     // Validate The Form
     if (!_formKey.currentState!.validate()) return;
     // Set Button State = Loading
-    this.setState(() {
-      buttonState = ButtonState.loading();
+    setState(() {
+      buttonState = ButtonState.loading;
     });
     // Add Users Data to User's DataModel
     final _user = UserModel(
       email: emailController.text,
       firstName: firstNameController.text,
       lastName: lastNameController.text,
-      phoneNumber: this._userController.currentUserPhoneNumber,
+      phoneNumber: _userController.currentUserPhoneNumber,
     );
-    this._userController.setUser(_user);
+    _userController.user = _user;
     // Add the User Personal Info in the Firestore
-    if (await this._userController.createUser()) {
+    if (await _userController.createUser()) {
       // After Successfully Added the User's Data
-      this.setState(() {
-        buttonState = ButtonState.success();
-        Future.delayed(Duration(seconds: 1)).then((value) {
+      setState(() {
+        buttonState = ButtonState.success;
+        Future.delayed(const Duration(seconds: 1)).then((value) {
           //  Navigate to Home Screen
-          Get.off(() => HomeScreen());
+          Get.offAllNamed(AppPaths.tripBooking);
         });
       });
     } else {

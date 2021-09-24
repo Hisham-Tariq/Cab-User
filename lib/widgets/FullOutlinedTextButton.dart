@@ -6,12 +6,14 @@ class FullOutlinedTextButton extends StatelessWidget {
   final Callback onPressed;
   final String text;
   final Color? buttonColor;
+  final Color? backgroundColor;
 
   const FullOutlinedTextButton({
     Key? key,
     required this.onPressed,
     required this.text,
     this.buttonColor,
+    this.backgroundColor,
   }) : super(key: key);
 
   @override
@@ -28,7 +30,7 @@ class FullOutlinedTextButton extends StatelessWidget {
               ),
             ),
             style: TextButton.styleFrom(
-              backgroundColor: Colors.white,
+              backgroundColor: this.backgroundColor ?? Colors.white,
               primary: this.buttonColor ?? AppColors.primary,
               shape: StadiumBorder(
                 side: BorderSide(

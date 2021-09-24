@@ -1,41 +1,66 @@
+import 'package:driving_app_its/controller/controller.dart';
 import 'package:driving_app_its/customization/customization.dart';
 import 'package:driving_app_its/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TripAtIdleState extends StatelessWidget {
   const TripAtIdleState({Key? key, required this.onSchedule}) : super(key: key);
   final Callback onSchedule;
-
+  
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
-      height: 200,
+    return SizedBox(
+      height: 250,
       child: Container(
-        padding: EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(20.0),
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10.0),
-        ),
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(30.0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                offset: const Offset(0, -3),
+                color: Colors.grey.shade400,
+                blurRadius: 15.0,
+                spreadRadius: 2.0,
+              ),
+            ]),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //TODO: Task Position
-            Text(
-              'Good Afternoon Test',
-              style: AppTextStyle.heading1,
+            Center(
+              child: Text(
+                'Start Trip',
+                style: GoogleFonts.catamaran(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ),
             ),
-            VerticalAppSpacer(),
+            const VerticalAppSpacer(space: 16.0),
+            Text(
+              'Welcome ${GetUtils.capitalize(Get.find<UserController>().user.firstName as String)}',
+              style: GoogleFonts.catamaran(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            const VerticalAppSpacer(space: 16.0),
             GestureDetector(
               onTap: onSchedule,
               child: Container(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 10.0,
                   vertical: 10.0,
                 ),
-                height: 60,
+                height: 80,
                 decoration: BoxDecoration(
                   color: Colors.green,
                   borderRadius: BorderRadius.circular(
@@ -51,7 +76,7 @@ class TripAtIdleState extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10.0),
                       height: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white,

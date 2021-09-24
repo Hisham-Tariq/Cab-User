@@ -7,10 +7,10 @@ class UserController extends GetxController {
   UserModel _user = UserModel();
   final _userDataReference = FirebaseFirestore.instance.collection('users');
 
+  String? get currentUserUID => FirebaseAuth.instance.currentUser!.uid;
+
   UserModel get user => _user;
-  setUser(UserModel user) {
-    _user = user;
-  }
+  set user(UserModel user) => _user = user;
 
   Future<bool> createUser() async {
     if (_user.firstName == null) return false;
@@ -25,7 +25,28 @@ class UserController extends GetxController {
     }
   }
 
-  readCurrentUser() {}
+  _listenToUserChanges() {
+    _userDataReference.doc(currentUserUID).snapshots().listen((event) {
+      this._user = UserModel.fromJson(event.data(), event.id);
+    });
+    update();
+  }
+
+  Future<bool> readCurrentUser() async {
+    try {
+      if (currentUserUID != null) {
+        var userData = await _userDataReference.doc(currentUserUID).get();
+        this._user = UserModel.fromJson(userData.data(), userData.id);
+        print('User\'s Eligibility is ${this._user.eligible}');
+        _listenToUserChanges();
+      }
+      return true;
+    } catch (e) {
+      print('Error: in readCurrentUser\n $e');
+      return false;
+    }
+  }
+
   readUser(id) {}
   readAllUsers() {}
 
