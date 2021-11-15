@@ -1,0 +1,10 @@
+export 'contact_binding.dart';
+export 'home_binding.dart';
+export 'introduction_binding.dart';
+export 'new_trip_booking_binding.dart';
+export 'otp_binding.dart';
+export 'phone_input_binding.dart';
+export 'splash_binding.dart';
+export 'trip_feedback_binding.dart';
+export 'unknown_route_binding.dart';
+export 'user_info_binding.dart';

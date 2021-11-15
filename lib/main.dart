@@ -1,15 +1,24 @@
-import 'package:driving_app_its/customization/customization.dart';
-import 'package:driving_app_its/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'FCMConfiguration/FCMConfiguration.dart';
-import 'bindings/bindings.dart';
+import 'package:get_storage/get_storage.dart';
+
+import 'app/FCMConfiguration/fcm_configuration.dart';
+import 'app/data/services/dependency_injection.dart';
+import 'app/data/services/theme_service.dart';
+import 'app/data/services/translations_service.dart';
+import 'app/routes/app_pages.dart';
+import 'app/routes/app_routes.dart';
+import 'app/ui/customization/customization.dart';
+import 'app/ui/theme/themes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
   await Firebase.initializeApp();
+  DependecyInjection.init();
+
   FirebaseMessaging.onMessage.listen(firebaseForegroundMessage);
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
   FirebaseMessaging.instance.requestPermission();
@@ -26,11 +35,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      initialBinding: AppBindings(),
-      theme: AppTheme.theme,
-      initialRoute: '/',
-      getPages: routes,
+      title: 'Cab',
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.theme,
+      darkTheme: Themes().darkTheme,
+      themeMode: ThemeService().getThemeMode(),
+      translations: Translation(),
+      locale: Locale('en'),
+      fallbackLocale: Locale('en'),
+      initialRoute: AppRoutes.SPLASH,
+      unknownRoute: AppPages.unknownRoutePage,
+      getPages: AppPages.pages,
     );
   }
 }
