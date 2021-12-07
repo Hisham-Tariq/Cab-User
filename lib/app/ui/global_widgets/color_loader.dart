@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_new
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -5,10 +7,11 @@ class ColorLoader extends StatefulWidget {
   final List<Color>? colors;
   final Duration? duration;
 
-  ColorLoader({this.colors, this.duration});
+  const ColorLoader({Key? key, this.colors, this.duration}) : super(key: key);
 
   @override
   _ColorLoaderState createState() =>
+      // ignore: unnecessary_this, no_logic_in_create_state
       _ColorLoaderState(this.colors, this.duration);
 }
 
@@ -69,12 +72,10 @@ class _ColorLoaderState extends State<ColorLoader>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 5.0,
-          valueColor: colorAnimations[tweenIndex],
-        ),
+    return Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 5.0,
+        valueColor: colorAnimations[tweenIndex],
       ),
     );
   }

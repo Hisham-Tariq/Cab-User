@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driving_app_its/app/controllers/controllers.dart';
+import 'package:driving_app_its/app/routes/app_routes.dart';
 import 'package:driving_app_its/app/ui/generated/assets.dart';
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 // import 'package:material_dialogs/widgets/buttons/icon_button.dart';
@@ -84,7 +84,7 @@ void handleConfirmUserTripHasEnded(RemoteMessage message) {
             Get.snackbar('Ride', 'Ride successfully completed');
             // updateTheRiderResponse(true, message.data['tripId']);
             navigator!.pop();
-            Get.toNamed('/rideFeedBack');
+            Get.toNamed(AppRoutes.TRIP_FEEDBACK);
           },
           text: 'Yes',
         ),

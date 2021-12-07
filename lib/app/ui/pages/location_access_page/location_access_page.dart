@@ -1,7 +1,6 @@
 import 'package:driving_app_its/app/ui/generated/assets.dart';
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
@@ -17,9 +16,11 @@ class LocationAccessPage extends GetView<LocationAccessController> {
         child: Column(
           children: [
             const VerticalSpacer(),
-            SvgPicture.asset(
-              Assets.svgLocation,
-              height: 300,
+            AspectRatio(
+              aspectRatio: 3.5 / 4,
+              child: SvgPicture.asset(
+                Assets.svgLocation,
+              ),
             ),
             const VerticalSpacer(space: 32.0),
             const Text(

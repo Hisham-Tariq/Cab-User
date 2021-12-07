@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'TextStyle.dart';
+import 'text_style.dart';
 import 'colors.dart';
 
 class AppTheme {
   static ThemeData theme = ThemeData(
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: Colors.white,
-    textSelectionTheme: TextSelectionThemeData(
+    textSelectionTheme: const TextSelectionThemeData(
       cursorColor: AppColors.primary,
     ),
     inputDecorationTheme: InputDecorationTheme(
-      contentPadding: EdgeInsets.symmetric(horizontal: 15),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 15),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(999.0),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.primary, width: 2),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
         borderRadius: BorderRadius.circular(999.0),
       ),
       hintStyle: AppTextStyle.textFieldHint,
@@ -25,7 +25,7 @@ class AppTheme {
         primary: Colors.white,
         backgroundColor: AppColors.primary,
         textStyle: AppTextStyle.button,
-        minimumSize: Size(150, 45),
+        minimumSize: const Size(150, 45),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5.0),
         ),

@@ -34,20 +34,20 @@ class BookedTripModel {
   });
 
   BookedTripModel.fromJson(Map<String, dynamic>? json) {
-    this.id = json!['id'];
-    this.userId = json['userId'];
-    this.userName = json['userName'];
-    this.userPhone = json['userPhone'];
-    this.userPickupLocation = _mapToLatLng(json['userPickupLocation']);
-    this.userDestinationLocation =
+    id = json!['id'];
+    userId = json['userId'];
+    userName = json['userName'];
+    userPhone = json['userPhone'];
+    userPickupLocation = _mapToLatLng(json['userPickupLocation']);
+    userDestinationLocation =
         _mapToLatLng(json['userDestinationLocation']);
-    this.riderId = json['riderId'];
-    this.riderName = json['riderName'];
-    this.riderPhone = json['riderPhone'];
-    this.tripPrice = json['tripPrice'];
-    this.tripDistance = json['tripDistance'];
-    this.vehicleType = json['vehicleType'];
-    this.bookedAt = json['bookedAt'];
+    riderId = json['riderId'];
+    riderName = json['riderName'];
+    riderPhone = json['riderPhone'];
+    tripPrice = json['tripPrice'];
+    tripDistance = json['tripDistance'];
+    vehicleType = json['vehicleType'];
+    bookedAt = json['bookedAt'];
   }
 
   Map<String, double> _latLngToMap(LatLng loc) {
@@ -62,17 +62,17 @@ class BookedTripModel {
   }
 
   Map<String, dynamic> toCreateJson() => {
-        'userId': this.userId,
-        'userName': this.userName,
-        'userPhone': this.userPhone,
+        'userId': userId,
+        'userName': userName,
+        'userPhone': userPhone,
         'userPickupLocation': _latLngToMap(userPickupLocation),
         'userDestinationLocation': _latLngToMap(userDestinationLocation),
-        'riderId': this.riderId,
-        'riderName': this.riderName,
-        'riderPhone': this.riderPhone,
-        'tripPrice': this.tripPrice,
-        'tripDistance': this.tripDistance,
-        'vehicleType': this.vehicleType,
+        'riderId': riderId,
+        'riderName': riderName,
+        'riderPhone': riderPhone,
+        'tripPrice': tripPrice,
+        'tripDistance': tripDistance,
+        'vehicleType': vehicleType,
         'bookedAt': FieldValue.serverTimestamp(),
         'tripStatus': 'pending',
       };

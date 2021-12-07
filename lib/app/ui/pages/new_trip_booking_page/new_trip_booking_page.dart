@@ -1,5 +1,6 @@
 import 'package:driving_app_its/app/controllers/controllers.dart';
 import 'package:driving_app_its/app/ui/customization/customization.dart';
+import 'package:driving_app_its/app/ui/pages/new_trip_booking_page/sub_pages/not_eligible.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -10,10 +11,12 @@ import 'widgets/widgets.dart';
 import '../../global_widgets/global_widgets.dart';
 
 class NewTripBookingPage extends GetView<NewTripBookingController> {
-  const NewTripBookingPage({Key? key}) : super(key: key);
+  NewTripBookingPage({Key? key}) : super(key: key);
+  final _userController = Get.find<UserController>();
 
   @override
   Widget build(BuildContext context) {
+    _userController.user.eligible.printInfo();
     return Scaffold(
       key: controller.scaf,
       drawer: const AppDrawer(),
@@ -35,16 +38,12 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                   zoomControlsEnabled: false,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
-                  initialCameraPosition:
-                      logic.initialCameraPosition as CameraPosition,
-                  onMapCreated: (controller) =>
-                      logic.googleMapController = controller,
+                  initialCameraPosition: logic.initialCameraPosition as CameraPosition,
+                  onMapCreated: (controller) => logic.googleMapController = controller,
                   markers: {
                     logic.markers['pickup'] as Marker,
-                    if (logic.markers['destination'] != null)
-                      logic.markers['destination'] as Marker,
-                    if (controller.availableRidersLocation.isNotEmpty)
-                      ...controller.availableRidersLocation.values.toSet(),
+                    if (logic.markers['destination'] != null) logic.markers['destination'] as Marker,
+                    if (controller.availableRidersLocation.isNotEmpty) ...controller.availableRidersLocation.values.toSet(),
                   },
                   polylines: {
                     if (logic.tripDirections != null)
@@ -52,14 +51,11 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                         polylineId: const PolylineId('overview_polyline'),
                         color: Colors.red,
                         width: 5,
-                        points: logic.tripDirections!.polylinePoints
-                            .map((e) => LatLng(e.latitude, e.longitude))
-                            .toList(),
+                        points: logic.tripDirections!.polylinePoints.map((e) => LatLng(e.latitude, e.longitude)).toList(),
                       ),
                   },
                   onCameraMove: (position) {
-                    if (logic.currentBookingState == BookingState.pickup ||
-                        logic.currentBookingState == BookingState.destination) {
+                    if (logic.currentBookingState == BookingState.pickup || logic.currentBookingState == BookingState.destination) {
                       controller.currentCameraPosDebouncer.run(() {
                         logic.currentCameraLatLng = LatLng(
                           position.target.latitude,
@@ -92,7 +88,7 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                       ),
                     ),
                   ),
-                if (logic.currentBookingState == BookingState.idle)
+                if (logic.currentBookingState == BookingState.idle && _userController.user.eligible!)
                   Positioned(
                     left: 0,
                     right: 0,
@@ -103,10 +99,15 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                       },
                     ),
                   ),
+                if (logic.currentBookingState == BookingState.idle && !_userController.user.eligible!)
+                  const Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: NotEligibleForBooking(),
+                  ),
                 AnimatedPositioned(
-                  top: logic.currentBookingState == BookingState.pickup
-                      ? 0
-                      : Get.height,
+                  top: logic.currentBookingState == BookingState.pickup ? 0 : Get.height,
                   child: SetLocation(
                     title: 'Pickup',
                     intialAddress: controller.pickupAddress!,
@@ -123,16 +124,13 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                         );
                       }
                     },
-                    onLocationSelectedByPlace:
-                        logic.pickupLocationSelectedByPlace,
+                    onLocationSelectedByPlace: logic.pickupLocationSelectedByPlace,
                     onLocationSelectedByMap: logic.pickupLocationByMap,
                   ),
                   duration: const Duration(milliseconds: 300),
                 ),
                 AnimatedPositioned(
-                  top: logic.currentBookingState == BookingState.destination
-                      ? 0
-                      : Get.height,
+                  top: logic.currentBookingState == BookingState.destination ? 0 : Get.height,
                   child: SetLocation(
                     onBack: () {
                       logic.changeBookingState(BookingState.pickup);
@@ -148,8 +146,7 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                         );
                       }
                     },
-                    onLocationSelectedByPlace:
-                        logic.destinationLocationSelectedByPlace,
+                    onLocationSelectedByPlace: logic.destinationLocationSelectedByPlace,
                     onLocationSelectedByMap: logic.destinationLocationByMap,
                   ),
                   duration: const Duration(milliseconds: 300),

@@ -26,15 +26,15 @@ class FullOutlinedTextButton extends StatelessWidget {
             child: Text(
               text,
               style: AppTextStyle.outlinedButton.copyWith(
-                color: this.buttonColor ?? AppColors.primary,
+                color: buttonColor ?? AppColors.primary,
               ),
             ),
             style: TextButton.styleFrom(
-              backgroundColor: this.backgroundColor ?? Colors.white,
-              primary: this.buttonColor ?? AppColors.primary,
+              backgroundColor: backgroundColor ?? Colors.white,
+              primary: buttonColor ?? AppColors.primary,
               shape: StadiumBorder(
                 side: BorderSide(
-                  color: this.buttonColor ?? AppColors.primary,
+                  color: buttonColor ?? AppColors.primary,
                   width: 1,
                 ),
               ),

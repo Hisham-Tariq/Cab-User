@@ -1,6 +1,6 @@
 import '../bindings/location_access_binding.dart';
 import '../ui/pages/location_access_page/location_access_page.dart';
-      import '../bindings/bindings.dart';
+import '../bindings/bindings.dart';
 import '../ui/pages/trip_feedback_page/trip_feedback_page.dart';
 import '../ui/pages/contact_page/contact_page.dart';
 import '../ui/pages/new_trip_booking_page/new_trip_booking_page.dart';
@@ -9,20 +9,16 @@ import '../ui/pages/otp_page/otp_page.dart';
 import '../ui/pages/phone_input_page/phone_input_page.dart';
 import '../ui/pages/introduction_page/introduction_page.dart';
 import '../ui/pages/splash_page/splash_page.dart';
-      import 'package:get/get.dart';
-import 'package:get/get_navigation/src/routes/get_route.dart';
-
-import '../bindings/home_binding.dart';
-// import '../ui/pages/home_page/home_page.dart';
+import 'package:get/get.dart';
 import '../ui/pages/unknown_route_page/unknown_route_page.dart';
 import 'app_routes.dart';
 
-final _defaultTransition = Transition.native;
+const _defaultTransition = Transition.native;
 
 class AppPages {
   static final unknownRoutePage = GetPage(
     name: AppRoutes.UNKNOWN,
-    page: () => UnknownRoutePage(),
+    page: () => const UnknownRoutePage(),
     transition: _defaultTransition,
   );
 
@@ -42,7 +38,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.INTRODUCTION,
-      page: () => IntroductionPage(),
+      page: () => const IntroductionPage(),
       binding: IntroductionBinding(),
       transition: _defaultTransition,
     ),
@@ -57,7 +53,8 @@ class AppPages {
       page: () => const PhoneInputPage(),
       binding: PhoneInputBinding(isNewUser: false),
       transition: _defaultTransition,
-    ),GetPage(
+    ),
+    GetPage(
       name: AppRoutes.SIGNUP,
       page: () => const PhoneInputPage(),
       binding: PhoneInputBinding(),
@@ -83,21 +80,21 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.CONTACT,
-      page: () => ContactPage(),
+      page: () => const ContactPage(),
       binding: ContactBinding(),
-      transition: _defaultTransition,
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: AppRoutes.TRIP_FEEDBACK,
-      page: () => TripFeedbackPage(),
+      page: () => const TripFeedbackPage(),
       binding: TripFeedbackBinding(),
       transition: _defaultTransition,
     ),
     GetPage(
       name: AppRoutes.LOCATION_ACCESS,
-      page: () => LocationAccessPage(),
+      page: () => const LocationAccessPage(),
       binding: LocationAccessBinding(),
       transition: _defaultTransition,
-    ), 
-];
+    ),
+  ];
 }

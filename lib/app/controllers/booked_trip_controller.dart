@@ -6,13 +6,9 @@ class BookedTripController {
   var tripsRef = FirebaseFirestore.instance.collection('BookedTrips');
   var riderRef = FirebaseFirestore.instance.collection('ride');
   var userRef = FirebaseFirestore.instance.collection('users');
-  BookedTripModel? _bookedTrip;
+  BookedTripModel? bookedTrip;
 
-  BookedTripModel? get bookedTrip => _bookedTrip;
 
-  set bookedTrip(BookedTripModel? value) {
-    _bookedTrip = value;
-  }
 
   Future<bool> doesTripIdExist(id) async =>
       (await tripsRef.doc(id).get()).exists;
@@ -22,17 +18,17 @@ class BookedTripController {
       // do {
       //   tripId = getRandomString(30);
       // } while (await this.doesTripIdExist(tripId));
-      await tripsRef.doc(tripId).set(_bookedTrip!.toCreateJson());
+      await tripsRef.doc(tripId).set(bookedTrip!.toCreateJson());
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(_bookedTrip!.userId)
+          .doc(bookedTrip!.userId)
           .update({
         'eligible': false,
         'currentBooking': tripId,
       });
       await FirebaseFirestore.instance
           .collection('rider')
-          .doc(_bookedTrip!.riderId)
+          .doc(bookedTrip!.riderId)
           .update({
         'eligible': false,
         'currentBooking': tripId,

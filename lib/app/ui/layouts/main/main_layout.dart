@@ -10,7 +10,7 @@ class MainLayout extends GetView<MainController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cab'),
+        title: const Text('Cab'),
       ),
       body: Column(
         children: [

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:driving_app_its/app/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -8,17 +7,14 @@ class SplashController extends GetxController {
   @override
   onInit() async {
     super.onInit();
-
+    (await isLocationPermissionGranted()).printInfo();
     if (await isLocationPermissionGranted()) {
       var controller = Get.find<UserController>();
       if (controller.isUserNotLoggedIn) {
-        Future.delayed(const Duration(seconds: 1))
-            .then((_) => Get.offAllNamed(AppRoutes.INTRODUCTION));
+        Future.delayed(const Duration(seconds: 1)).then((_) => Get.offAllNamed(AppRoutes.INTRODUCTION));
       } else {
         // User is Signed In
-        controller
-            .userWithPhoneNumberIsExist(controller.userPhoneNumber)
-            .then((value) {
+        controller.userWithPhoneNumberIsExist(controller.userPhoneNumber).then((value) {
           if (value) {
             controller.readCurrentUser().then((_) {
               Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING);
@@ -39,6 +35,4 @@ class SplashController extends GetxController {
   Future<bool> isLocationPermissionGranted() async {
     return Permission.locationWhenInUse.status.isGranted;
   }
-
-  
 }

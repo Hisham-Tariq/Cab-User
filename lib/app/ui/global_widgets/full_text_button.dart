@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_this
+
 import 'package:flutter/material.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import '../customization/customization.dart';
@@ -26,12 +28,12 @@ class FullTextButton extends StatelessWidget {
             child: Text(
               text,
               style: AppTextStyle.button.copyWith(
-                color: this.textColor ?? AppTextStyle.button.color,
+                color: textColor ?? AppTextStyle.button.color,
               ),
             ),
             style: TextButton.styleFrom(
               backgroundColor: this.buttonColor ?? AppColors.primary,
-              shape: StadiumBorder(),
+              shape: const StadiumBorder(),
             ),
           ),
         ),

@@ -1,9 +1,9 @@
 class AppInformation {
-  static final name = 'cab';
-  static final title = 'Cab';
-  static final appIdAndroid = "";
-  static final appIdIos = "";
-  static final masterAdminEmail = "";
-  static final googleMapsKey = '';
-  static final googleMapsKeyURL = '';
+  static const name = 'cab';
+  static const title = 'Cab';
+  static const appIdAndroid = "";
+  static const appIdIos = "";
+  static const masterAdminEmail = "";
+  static const googleMapsKey = '';
+  static const googleMapsKeyURL = '';
 }

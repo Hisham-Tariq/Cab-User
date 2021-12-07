@@ -2,7 +2,6 @@ import 'package:driving_app_its/app/controllers/controllers.dart';
 import 'package:driving_app_its/app/ui/customization/customization.dart';
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';

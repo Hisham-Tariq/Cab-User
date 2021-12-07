@@ -18,7 +18,7 @@ class ModelHelpers {
     return json;
   }
 
-  String dateFromDocument(dynamic? date) {
+  String dateFromDocument(dynamic date) {
     if (date != null) {
       return date.toDate().toString();
     }

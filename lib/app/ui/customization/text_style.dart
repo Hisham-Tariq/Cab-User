@@ -17,7 +17,7 @@ class AppTextStyle {
   );
 
   static final TextStyle description = GoogleFonts.catamaran(
-    textStyle: TextStyle(
+    textStyle: const TextStyle(
       fontSize: 11,
       color: Colors.black45,
     ),
@@ -75,12 +75,12 @@ class AppTextStyle {
     fontSize: 20,
   );
 
-  static final TextStyle emphasisText = TextStyle(
+  static const TextStyle emphasisText = TextStyle(
     color: AppColors.emphasis,
     fontWeight: FontWeight.bold,
   );
 
-  static final TextStyle emphasisTitle = TextStyle(
+  static const TextStyle emphasisTitle = TextStyle(
     color: AppColors.emphasis,
     fontSize: 13,
     fontWeight: FontWeight.bold,

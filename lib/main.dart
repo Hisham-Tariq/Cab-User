@@ -28,10 +28,12 @@ Future<void> main() async {
   }, onDone: () {
     print('Done Message');
   });
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -41,8 +43,8 @@ class MyApp extends StatelessWidget {
       darkTheme: Themes().darkTheme,
       themeMode: ThemeService().getThemeMode(),
       translations: Translation(),
-      locale: Locale('en'),
-      fallbackLocale: Locale('en'),
+      locale: const Locale('en'),
+      fallbackLocale: const Locale('en'),
       initialRoute: AppRoutes.SPLASH,
       unknownRoute: AppPages.unknownRoutePage,
       getPages: AppPages.pages,

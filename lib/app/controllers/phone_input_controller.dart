@@ -11,7 +11,7 @@ class PhoneInputController extends GetxController {
     isNewUser.printInfo();
   }
   final bool isNewUser;
-  UserController _userController = Get.find<UserController>();
+  final _userController = Get.find<UserController>();
   final formKey = GlobalKey<FormState>();
 
   final phoneController = TextEditingController();

@@ -25,16 +25,16 @@ class AppTextOutlinedButton extends StatelessWidget {
       child: Text(
         text,
         style: AppTextStyle.button.copyWith(
-          color: this.buttonColor ?? AppColors.primary,
+          color: buttonColor ?? AppColors.primary,
         ),
       ),
       style: TextButton.styleFrom(
         backgroundColor: Colors.white,
-        minimumSize: this.minSize,
+        minimumSize: minSize,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5.0),
           side: BorderSide(
-            color: this.buttonColor ?? AppColors.primary,
+            color: buttonColor ?? AppColors.primary,
           ),
         ),
       ),

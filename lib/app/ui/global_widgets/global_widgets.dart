@@ -1,6 +1,6 @@
-export 'AppTextOutlinedButton.dart';
-export 'FullOutlinedTextButton.dart';
-export 'FullTextButton.dart';
+export 'app_text_outlined_button.dart';
+export 'full_outlined_text_button.dart';
+export 'full_text_button.dart';
 export 'animated_button.dart';
 export 'app_name.dart';
 export 'app_tag_line.dart';

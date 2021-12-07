@@ -12,9 +12,9 @@ class OtpPage extends GetView<OtpController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: SingleChildScrollView(
             child: Column(
@@ -35,6 +35,7 @@ class OtpPage extends GetView<OtpController> {
                     ),
                     const SizedBox(height: 4),
                     TextField(
+                      focusNode: controller.otpFieldNode,
                       onChanged: controller.onOtpChanged,
                     ),
                     const SizedBox(height: 4),

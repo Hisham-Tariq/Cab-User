@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 class TripAtIdleState extends StatelessWidget {
   const TripAtIdleState({Key? key, required this.onSchedule}) : super(key: key);
   final Callback onSchedule;
-  
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -33,14 +33,12 @@ class TripAtIdleState extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //TODO: Task Position
             Center(
               child: Text(
                 'Start Trip',
                 style: GoogleFonts.catamaran(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.2,
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ),

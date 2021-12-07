@@ -14,7 +14,7 @@ class AnimatedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
       child: Container(
         key: UniqueKey(),
         child: stateButtons[currentState],

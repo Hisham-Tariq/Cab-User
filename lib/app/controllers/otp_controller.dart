@@ -10,6 +10,7 @@ class OtpController extends GetxController {
   String get verificationId => Get.arguments['verificationId'];
   int? get forceResendingToken => Get.arguments['forceResendingToken'];
   bool get isNewUser => Get.arguments['isNewUser'];
+  final otpFieldNode = FocusNode();
   String otpCode = '';
   final buttonState = ButtonState.idle.obs;
 
@@ -25,8 +26,10 @@ class OtpController extends GetxController {
 
   void onOtpChanged(String value) {
     otpCode = value;
+
     if (value.length == 6) {
       FocusScope.of(Get.context!).unfocus();
+      otpFieldNode.unfocus();
       Future.delayed(const Duration(milliseconds: 10)).then((value) {
         verifyOTPCode();
       });
@@ -40,9 +43,7 @@ class OtpController extends GetxController {
       Get.offAllNamed(AppRoutes.USER_INFO);
     } else {
       var controller = Get.find<UserController>();
-      controller
-          .readCurrentUser()
-          .then((_) => Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING));
+      controller.readCurrentUser().then((_) => Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING));
     }
   }
 

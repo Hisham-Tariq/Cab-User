@@ -17,6 +17,7 @@ enum VehicleType { rickshaw, bike, car }
 //          or
 // 2. Some Specific Vehicle such as in Bikes it could be Seventy --> SpecificVehicle
 
+// ignore: must_be_immutable
 class ChoseVehicle extends StatelessWidget {
   ChoseVehicle(
       {Key? key, required this.onBack, required this.onVehicleSelected})

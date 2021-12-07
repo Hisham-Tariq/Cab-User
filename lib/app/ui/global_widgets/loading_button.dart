@@ -22,9 +22,9 @@ class LoadingButton extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: child ??
-          ColorLoader(
-            colors: const [Colors.white],
-            duration: const Duration(seconds: 1),
+          const ColorLoader(
+            colors: [Colors.white],
+            duration: Duration(seconds: 1),
           ),
     );
   }

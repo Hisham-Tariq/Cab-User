@@ -13,8 +13,8 @@ class HomeBackButton extends StatelessWidget {
       child: Container(
         height: 40,
         width: 40,
-        child: Icon(Icons.arrow_back, color: Colors.white),
-        decoration: BoxDecoration(
+        child: const Icon(Icons.arrow_back, color: Colors.white),
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.green,
         ),

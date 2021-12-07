@@ -467,6 +467,7 @@ class RequestNearbyRider {
 
   void start() async {
     if (!_isRequestingStarted) {
+      if (Get.isDialogOpen!) Get.back();
       _loadingDialog('Finding Nearest Rider Available');
       _isRequestingStarted = true;
       printInfo(info: 'Requesting to Riders have been Started');

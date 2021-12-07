@@ -25,12 +25,12 @@ class AppTextButton extends StatelessWidget {
       child: Text(
         text,
         style: AppTextStyle.button.copyWith(
-          color: this.textColor ?? AppTextStyle.button.color,
+          color: textColor ?? AppTextStyle.button.color,
         ),
       ),
       style: TextButton.styleFrom(
-        backgroundColor: this.buttonColor ?? AppColors.primary,
-        minimumSize: this.minSize,
+        backgroundColor: buttonColor ?? AppColors.primary,
+        minimumSize: minSize,
       ),
     );
   }

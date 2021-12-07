@@ -13,7 +13,7 @@ class BookingDone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: double.infinity,
       width: double.infinity,
       child: Stack(
@@ -46,7 +46,7 @@ class BookingDone extends StatelessWidget {
                   const VerticalSpacer(space: 16),
                   Row(
                     children: [
-                      Text('Pickup: ', style: AppTextStyle.emphasisTitle),
+                      const Text('Pickup: ', style: AppTextStyle.emphasisTitle),
                       const HorizontalSpacer(),
                       Text(tripInfo['pickup'] as String,
                           style: AppTextStyle.normal),
@@ -55,7 +55,7 @@ class BookingDone extends StatelessWidget {
                   const VerticalSpacer(),
                   Row(
                     children: [
-                      Text('Destination: ', style: AppTextStyle.emphasisTitle),
+                      const Text('Destination: ', style: AppTextStyle.emphasisTitle),
                       const HorizontalSpacer(),
                       Expanded(
                         child: SingleChildScrollView(
@@ -65,20 +65,20 @@ class BookingDone extends StatelessWidget {
                       ),
                     ],
                   ),
-                  VerticalSpacer(),
+                  const VerticalSpacer(),
                   Row(
                     children: [
-                      Text('Distance: ', style: AppTextStyle.emphasisTitle),
-                      HorizontalSpacer(),
+                      const Text('Distance: ', style: AppTextStyle.emphasisTitle),
+                      const HorizontalSpacer(),
                       Text(tripInfo['distance'] as String,
                           style: AppTextStyle.normal),
                     ],
                   ),
-                  VerticalSpacer(),
+                  const VerticalSpacer(),
                   Row(
                     children: [
-                      Text('Duration: ', style: AppTextStyle.emphasisTitle),
-                      HorizontalSpacer(),
+                      const Text('Duration: ', style: AppTextStyle.emphasisTitle),
+                      const HorizontalSpacer(),
                       Text(tripInfo['duration'] as String,
                           style: AppTextStyle.normal),
                     ],

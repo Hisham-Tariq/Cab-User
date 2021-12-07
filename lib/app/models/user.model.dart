@@ -18,23 +18,24 @@ class UserModel {
 
   String get fullName => firstName! + " " + lastName!;
 
-  UserModel.fromJson(Map<String, dynamic>? userDetail, id) {
-    this.id = id;
-    this.firstName = userDetail!['firstName'];
-    this.lastName = userDetail['lastName'];
-    this.email = userDetail['email'];
-    this.phoneNumber = userDetail['phoneNumber'];
-    if (userDetail.containsKey('eligible'))
-      this.eligible = userDetail['eligible'];
-    if (userDetail.containsKey('currentBooking'))
-      this.currentBooking = userDetail['currentBooking'];
+  UserModel.fromJson(Map<String, dynamic>? userDetail, this.id) {
+    firstName = userDetail!['firstName'];
+    lastName = userDetail['lastName'];
+    email = userDetail['email'];
+    phoneNumber = userDetail['phoneNumber'];
+    if (userDetail.containsKey('eligible')) {
+      eligible = userDetail['eligible'];
+    }
+    if (userDetail.containsKey('currentBooking')) {
+      currentBooking = userDetail['currentBooking'];
+    }
   }
 
   Map<String, dynamic> toJsonToCreateUser() => {
-        'firstName': this.firstName,
-        'lastName': this.lastName,
-        'email': this.email,
-        'phoneNumber': this.phoneNumber,
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'phoneNumber': phoneNumber,
         'eligible': true,
       };
 }
