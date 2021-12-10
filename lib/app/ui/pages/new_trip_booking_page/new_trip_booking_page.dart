@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'booking_state.dart';
 import 'sub_pages/sub_pages.dart';
 import 'widgets/widgets.dart';
 import 'package:flutter/services.dart';
@@ -62,18 +61,15 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                     zoomControlsEnabled: false,
                     myLocationEnabled: true,
                     myLocationButtonEnabled: true,
-                    initialCameraPosition:
-                        logic.initialCameraPosition as CameraPosition,
+                    initialCameraPosition: logic.initialCameraPosition as CameraPosition,
                     onMapCreated: (controller) {
                       logic.googleMapController = controller;
                       changeMapStyle(context);
                     },
                     markers: {
                       logic.markers['pickup'] as Marker,
-                      if (logic.markers['destination'] != null)
-                        logic.markers['destination'] as Marker,
-                      if (controller.availableRidersLocation.isNotEmpty)
-                        ...controller.availableRidersLocation.values.toSet(),
+                      if (logic.markers['destination'] != null) logic.markers['destination'] as Marker,
+                      if (controller.availableRidersLocation.isNotEmpty) ...controller.availableRidersLocation.values.toSet(),
                     },
                     polylines: {
                       if (logic.tripDirections != null)
@@ -81,15 +77,11 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                           polylineId: const PolylineId('overview_polyline'),
                           color: context.theme.colorScheme.primary,
                           width: 5,
-                          points: logic.tripDirections!.polylinePoints
-                              .map((e) => LatLng(e.latitude, e.longitude))
-                              .toList(),
+                          points: logic.tripDirections!.polylinePoints.map((e) => LatLng(e.latitude, e.longitude)).toList(),
                         ),
                     },
                     onCameraMove: (position) {
-                      if (logic.currentBookingState == BookingState.pickup ||
-                          logic.currentBookingState ==
-                              BookingState.destination) {
+                      if (logic.tripBookingStep == 1 || logic.tripBookingStep == 2) {
                         controller.currentCameraPosDebouncer.run(() {
                           logic.currentCameraLatLng = LatLng(
                             position.target.latitude,
@@ -103,45 +95,16 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                   const Positioned(child: MiddleScreenLocationIcon()),
                   // Bottom Container
 
-                  /////////      Drawer Open Widget       ////////
-                  if (logic.currentBookingState == BookingState.idle)
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: CircleAvatar(
-                        radius: 25.0,
-                        backgroundColor: context.theme.colorScheme.primary,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.menu,
-                            color: context.theme.colorScheme.onPrimary,
-                            size: 20.0,
-                          ),
-                          onPressed: () {
-                            Get.find<NavigationController>()
-                                .scaffoldState
-                                .currentState!
-                                .openDrawer();
-                          },
-                        ),
-                      ),
-                    ),
                   /////////      Trip Start Widget       ////////
-                  if (logic.currentBookingState == BookingState.idle &&
-                      _userController.user.eligible!)
+                  if (logic.tripBookingStep == 0 && _userController.user.eligible!)
                     Positioned(
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      child: TripAtIdleState(
-                        onSchedule: () {
-                          logic.changeBookingState(BookingState.pickup);
-                        },
-                      ),
+                      child: TripAtIdleState(onSchedule: logic.forwardBookingState),
                     ),
                   /////////      Not Eligible Widget       ////////
-                  if (logic.currentBookingState == BookingState.idle &&
-                      !_userController.user.eligible!)
+                  if (logic.tripBookingStep == 0 && !_userController.user.eligible!)
                     const Positioned(
                       left: 0,
                       right: 0,
@@ -150,18 +113,13 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                     ),
                   /////////      Pickup Location Widget       ////////
                   AnimatedPositioned(
-                    top: logic.currentBookingState == BookingState.pickup
-                        ? 0
-                        : Get.height,
+                    top: logic.tripBookingStep == 1 ? 0 : Get.height,
                     child: SetLocation(
                       title: 'Pickup',
                       intialAddress: controller.pickupAddress!,
-                      onBack: () {
-                        logic.changeBookingState(BookingState.idle);
-                      },
                       onContinue: () {
                         if (logic.isPickupLocationIsValid()) {
-                          logic.changeBookingState(BookingState.destination);
+                          logic.forwardBookingState();
                         } else {
                           showAppSnackBar(
                             'Pickup Location',
@@ -169,25 +127,19 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                           );
                         }
                       },
-                      onLocationSelectedByPlace:
-                          logic.pickupLocationSelectedByPlace,
+                      onLocationSelectedByPlace: logic.pickupLocationSelectedByPlace,
                       onLocationSelectedByMap: logic.pickupLocationByMap,
                     ),
                     duration: const Duration(milliseconds: 300),
                   ),
                   /////////      Destination Location Widget       ////////
                   AnimatedPositioned(
-                    top: logic.currentBookingState == BookingState.destination
-                        ? 0
-                        : Get.height,
+                    top: logic.tripBookingStep == 2 ? 0 : Get.height,
                     child: SetLocation(
-                      onBack: () {
-                        logic.changeBookingState(BookingState.pickup);
-                      },
                       title: 'Destination',
                       onContinue: () {
                         if (logic.isDestinationLocationIsValid()) {
-                          logic.changeBookingState(BookingState.vehicle);
+                          logic.forwardBookingState();
                         } else {
                           showAppSnackBar(
                             'Destination Location',
@@ -195,44 +147,27 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                           );
                         }
                       },
-                      onLocationSelectedByPlace:
-                          logic.destinationLocationSelectedByPlace,
+                      onLocationSelectedByPlace: logic.destinationLocationSelectedByPlace,
                       onLocationSelectedByMap: logic.destinationLocationByMap,
                     ),
                     duration: const Duration(milliseconds: 300),
                   ),
-                  if (logic.currentBookingState == BookingState.vehicle)
+                  if (logic.tripBookingStep == 3)
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: ChoseVehicle(
-                        onBack: () {
-                          logic.changeBookingState(BookingState.destination);
-                        },
                         onVehicleSelected: (String vehicle, int price) {
                           logic.selectedVehicle = vehicle;
                           logic.totalPrice = price;
-                          logic.changeBookingState(BookingState.rider);
+                          logic.forwardBookingState;
                           logic.findNearbyRiders();
                         },
                       ),
                     ),
-                  if (logic.currentBookingState == BookingState.rider)
-                    Positioned(
-                      left: 8,
-                      top: 8,
-                      child: HomeBackButton(
-                        onTap: () {
-                          logic.changeBookingState(BookingState.vehicle);
-                        },
-                      ),
-                    ),
-                  if (logic.currentBookingState == BookingState.done)
+                  if (logic.tripBookingStep == 5)
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: BookingDone(
-                        onBack: () {
-                          logic.changeBookingState(BookingState.rider);
-                        },
                         tripInfo: {
                           'distance': logic.tripDirections!.totalDistance,
                           'duration': logic.tripDirections!.totalDuration,
@@ -241,10 +176,40 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                         },
                       ),
                     ),
+                  /////////      Booking State Change Widget       ////////
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: logic.tripBookingStep == 0 ? const HomeDrawerTogggleButton() : HomeBackButton(onTap: controller.backwardBookingState),
+                  ),
                 ],
               ),
             );
           }
+        },
+      ),
+    );
+  }
+}
+
+class HomeDrawerTogggleButton extends StatelessWidget {
+  const HomeDrawerTogggleButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: 25.0,
+      backgroundColor: context.theme.colorScheme.primary,
+      child: IconButton(
+        icon: Icon(
+          Icons.menu,
+          color: context.theme.colorScheme.onPrimary,
+          size: 20.0,
+        ),
+        onPressed: () {
+          Get.find<NavigationController>().scaffoldState.currentState!.openDrawer();
         },
       ),
     );

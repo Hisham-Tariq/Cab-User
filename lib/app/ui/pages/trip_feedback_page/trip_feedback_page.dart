@@ -1,8 +1,7 @@
-import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
+import '../../global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/controllers.dart';
 import '../../theme/text_theme.dart';
 

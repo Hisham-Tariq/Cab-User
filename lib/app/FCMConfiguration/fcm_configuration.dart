@@ -90,7 +90,7 @@ void handleConfirmUserTripHasEnded(RemoteMessage message) {
             navigator!.pop();
             Get.toNamed(AppRoutes.TRIP_FEEDBACK);
           },
-          child: Text('Yes'),
+          child: const Text('Yes'),
         ),
         OutlinedButton(
           onPressed: () {

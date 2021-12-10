@@ -3,14 +3,12 @@ import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../models/models.dart';
 import 'package:flutter/material.dart';
 
 import '../../../theme/text_theme.dart';
 import '../../../utils/utils.dart';
-import '../widgets/home_back_button.dart';
 
 enum LocationBy { place, map }
 
@@ -21,14 +19,12 @@ class SetLocation extends StatefulWidget {
     required this.onContinue,
     required this.onLocationSelectedByPlace,
     required this.onLocationSelectedByMap,
-    required this.onBack,
     this.intialAddress = "",
   }) : super(key: key);
   final String title;
   final Function onLocationSelectedByPlace;
   final Function onLocationSelectedByMap;
   final Callback onContinue;
-  final Callback onBack;
   final String intialAddress;
 
   @override
@@ -71,11 +67,6 @@ class _SetLocationState extends State<SetLocation> {
               top: _locationBy == LocationBy.place ? 0 : Get.height,
               duration: _animationDuration,
               child: _locationByPlace(),
-            ),
-            Positioned(
-              left: 8,
-              top: 8,
-              child: HomeBackButton(onTap: widget.onBack),
             ),
             // Positioned(
             //   top: 10,

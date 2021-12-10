@@ -1,14 +1,11 @@
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
-import 'package:driving_app_its/app/ui/pages/new_trip_booking_page/widgets/widgets.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
 class BookingDone extends StatelessWidget {
-  const BookingDone({Key? key, required this.tripInfo, required this.onBack}) : super(key: key);
+  const BookingDone({Key? key, required this.tripInfo}) : super(key: key);
   final Map<String, String> tripInfo;
-  final Callback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +14,6 @@ class BookingDone extends StatelessWidget {
       width: double.infinity,
       child: Stack(
         children: [
-          Positioned(
-            left: 8,
-            top: 8,
-            child: HomeBackButton(onTap: onBack),
-          ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -38,7 +30,7 @@ class BookingDone extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
+                  const Center(
                     child: Text('Trip Detail'),
                   ),
                   const VerticalSpacer(space: 16),
