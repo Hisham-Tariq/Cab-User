@@ -7,7 +7,6 @@ import 'package:get_storage/get_storage.dart';
 import 'app/FCMConfiguration/fcm_configuration.dart';
 import 'app/data/services/app_dependencies.dart';
 import 'app/data/services/dependency_injection.dart';
-import 'app/data/services/theme_service.dart';
 import 'app/data/services/translations_service.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';

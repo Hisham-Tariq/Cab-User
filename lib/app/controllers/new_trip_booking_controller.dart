@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:driving_app_its/app/models/models.dart';
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
-import 'package:driving_app_its/app/ui/pages/new_trip_booking_page/booking_state.dart';
 import 'package:driving_app_its/app/ui/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -27,8 +26,16 @@ class Rider {
   String riderId;
 }
 
+//////// Booking Steps    ////////
+/// 0. Idle
+/// 1. Select Pickup Location
+/// 2. Select Destination Location
+/// 3. Select Vehicle
+/// 4. Finding Rider
+/// 5. Done
+
 class NewTripBookingController extends GetxController {
-  var currentBookingState = BookingState.idle;
+  int tripBookingStep = 0;
   Position? currentPosition;
   CameraPosition? initialCameraPosition;
   GoogleMapController? googleMapController;
@@ -129,11 +136,6 @@ class NewTripBookingController extends GetxController {
   }
 
   int get totalTripPrice => (tripDurationInMins * tripDistance).toInt();
-
-  changeBookingState(BookingState newState) {
-    currentBookingState = newState;
-    update();
-  }
 
   updateCurrentPosition() async {
     currentPosition = await Geolocator.getCurrentPosition();
@@ -368,10 +370,22 @@ class NewTripBookingController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    if(googleMapController != null ) {
+    if (googleMapController != null) {
       googleMapController!.dispose();
     }
   }
+
+  forwardBookingState() {
+    tripBookingStep++;
+    update();
+  }
+
+  backwardBookingState() {
+    tripBookingStep--;
+    update();
+  }
+
+  onBackButtonPressed() {}
 }
 
 class RequestNearbyRider {

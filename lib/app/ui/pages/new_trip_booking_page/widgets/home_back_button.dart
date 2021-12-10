@@ -11,16 +11,13 @@ class HomeBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        height: 40,
-        width: 40,
+      child: CircleAvatar(
+        backgroundColor: context.theme.colorScheme.primary,
+        radius: 25,
         child: Icon(
           Icons.arrow_back,
+          size: 20,
           color: context.theme.colorScheme.onPrimary,
-        ),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: context.theme.colorScheme.primary,
         ),
       ),
     );

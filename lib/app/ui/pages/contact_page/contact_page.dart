@@ -1,4 +1,3 @@
-import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/controllers.dart';

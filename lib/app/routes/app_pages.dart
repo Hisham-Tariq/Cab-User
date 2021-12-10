@@ -28,7 +28,7 @@ class AppPages {
     unknownRoutePage,
     GetPage(
       name: AppRoutes.HOME,
-      page: () => HomeLayout(),
+      page: () => const HomeLayout(),
       binding: HomeBinding(),
       transition: _defaultTransition,
     ),

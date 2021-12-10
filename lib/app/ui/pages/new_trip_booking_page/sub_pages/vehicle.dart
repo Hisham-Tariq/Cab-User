@@ -1,13 +1,11 @@
-import 'package:driving_app_its/app/controllers/controllers.dart';
-import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
-import 'package:driving_app_its/app/ui/pages/new_trip_booking_page/widgets/widgets.dart';
+import '../../../../controllers/controllers.dart';
+import '../../../global_widgets/global_widgets.dart';
 
 import '../../../generated/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../theme/text_theme.dart';
 import '../../../utils/utils.dart';
@@ -20,9 +18,8 @@ enum VehicleType { rickshaw, bike, car }
 
 // ignore: must_be_immutable
 class ChoseVehicle extends StatelessWidget {
-  ChoseVehicle({Key? key, required this.onBack, required this.onVehicleSelected}) : super(key: key);
+  ChoseVehicle({Key? key, required this.onVehicleSelected}) : super(key: key);
   final Function onVehicleSelected;
-  final Callback onBack;
 
   VehicleType? currentVehicleType;
 
@@ -39,11 +36,6 @@ class ChoseVehicle extends StatelessWidget {
       width: double.infinity,
       child: Stack(
         children: [
-          Positioned(
-            left: 8,
-            top: 8,
-            child: HomeBackButton(onTap: onBack),
-          ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Column(
