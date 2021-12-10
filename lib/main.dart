@@ -5,13 +5,13 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'app/FCMConfiguration/fcm_configuration.dart';
+import 'app/data/services/app_dependencies.dart';
 import 'app/data/services/dependency_injection.dart';
 import 'app/data/services/theme_service.dart';
 import 'app/data/services/translations_service.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
-import 'app/ui/customization/customization.dart';
-import 'app/ui/theme/themes.dart';
+import 'app/ui/theme/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,11 +37,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      darkTheme: darkTheme,
+      theme: lightTheme,
+      initialBinding: AppDependencies(context),
       title: 'Cab',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme,
-      darkTheme: Themes().darkTheme,
-      themeMode: ThemeService().getThemeMode(),
       translations: Translation(),
       locale: const Locale('en'),
       fallbackLocale: const Locale('en'),

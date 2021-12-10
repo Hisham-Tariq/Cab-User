@@ -1,5 +1,5 @@
-import '../../../customization/customization.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/context_extensions.dart';
 
 class MiddleScreenLocationIcon extends StatelessWidget {
   const MiddleScreenLocationIcon({Key? key, this.size = 30}) : super(key: key);
@@ -20,7 +20,7 @@ class MiddleScreenLocationIcon extends StatelessWidget {
               child: Icon(
                 Icons.location_on,
                 size: size,
-                color: AppColors.primary,
+                color: context.theme.colorScheme.primary,
               ),
             ),
           ),

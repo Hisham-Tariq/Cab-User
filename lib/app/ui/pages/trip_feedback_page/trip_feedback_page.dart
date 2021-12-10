@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/controllers.dart';
+import '../../theme/text_theme.dart';
 
 class TripFeedbackPage extends GetView<TripFeedbackController> {
   const TripFeedbackPage({Key? key}) : super(key: key);
@@ -27,7 +28,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             'How was client behaviour',
-                            style: GoogleFonts.catamaran(
+                            style: AppTextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.grey.shade700,
@@ -42,8 +43,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                             allowHalfRating: false,
                             itemCount: 5,
                             glowColor: Colors.green.shade200,
-                            itemPadding:
-                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            itemPadding: const EdgeInsets.symmetric(horizontal: 12.0),
                             itemBuilder: (context, _) => const Icon(
                               Icons.star,
                               color: Colors.green,
@@ -57,7 +57,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             'How is app working?',
-                            style: GoogleFonts.catamaran(
+                            style: AppTextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.grey.shade700,
@@ -72,8 +72,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                             allowHalfRating: false,
                             itemCount: 5,
                             glowColor: Colors.green.shade200,
-                            itemPadding:
-                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            itemPadding: const EdgeInsets.symmetric(horizontal: 12.0),
                             itemBuilder: (context, _) => const Icon(
                               Icons.star,
                               color: Colors.green,
@@ -87,7 +86,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             'How is app working?',
-                            style: GoogleFonts.catamaran(
+                            style: AppTextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.grey.shade700,
@@ -102,8 +101,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                             allowHalfRating: false,
                             itemCount: 5,
                             glowColor: Colors.green.shade200,
-                            itemPadding:
-                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            itemPadding: const EdgeInsets.symmetric(horizontal: 12.0),
                             itemBuilder: (context, _) => const Icon(
                               Icons.star,
                               color: Colors.green,
@@ -115,11 +113,10 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                         const VerticalSpacer(space: 24.0),
                         Row(children: [
                           Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
+                            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
                             child: Text(
                               'Any Comment',
-                              style: GoogleFonts.catamaran(
+                              style: AppTextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.grey.shade700,
@@ -132,7 +129,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                           minLines: 6,
                           maxLines: 10,
                           controller: controller.comment,
-                          style: GoogleFonts.catamaran(
+                          style: AppTextStyle(
                             fontSize: 14.0,
                             color: Colors.grey.shade700,
                           ),
@@ -148,10 +145,12 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                           ),
                         ),
                         const VerticalSpacer(space: 12.0),
-                        FullOutlinedTextButton(
+                        OutlinedButton(
                           onPressed: controller.uploadRating,
-                          text: 'Submit',
-                          backgroundColor: Colors.white.withOpacity(0.0),
+                          child: const Text('Submit'),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white.withOpacity(0.0),
+                          ),
                         ),
                         const VerticalSpacer(space: 12.0),
                       ],
@@ -172,7 +171,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                   child: Center(
                     child: Text(
                       'Ride Finished',
-                      style: GoogleFonts.catamaran(
+                      style: AppTextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         color: Colors.green,
@@ -187,7 +186,7 @@ class TripFeedbackPage extends GetView<TripFeedbackController> {
                 Icons.clear_rounded,
                 size: 32,
               ),
-              onPressed: controller.closeRating ,
+              onPressed: controller.closeRating,
             ),
           ],
         ),

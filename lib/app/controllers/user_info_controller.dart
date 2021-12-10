@@ -51,7 +51,7 @@ class UserInfoController extends GetxController {
       changeToSuccessState();
       Future.delayed(const Duration(seconds: 1)).then((value) {
         //  Navigate to Home Screen
-        Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING);
+        Get.offAllNamed(AppRoutes.HOME);
       });
     } else {
       // Error While adding the User's Data

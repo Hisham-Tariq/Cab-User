@@ -1,5 +1,4 @@
 import 'package:driving_app_its/app/controllers/controllers.dart';
-import 'package:driving_app_its/app/ui/customization/customization.dart';
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 
 import 'package:get/get.dart';
@@ -8,6 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../models/models.dart';
 import 'package:flutter/material.dart';
+
+import '../../../theme/text_theme.dart';
+import '../../../utils/utils.dart';
+import '../widgets/home_back_button.dart';
 
 enum LocationBy { place, map }
 
@@ -52,47 +55,55 @@ class _SetLocationState extends State<SetLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: Get.height,
-      width: Get.width,
-      child: Stack(
-        children: [
-          AnimatedPositioned(
-            bottom: _locationBy == LocationBy.map ? 0 : Get.width,
-            child: _locationByMap(),
-            duration: _animationDuration,
-          ),
-          AnimatedPositioned(
-            top: _locationBy == LocationBy.place ? 0 : Get.height,
-            duration: _animationDuration,
-            child: _locationByPlace(),
-          ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: CircleAvatar(
-              radius: 25.0,
-              backgroundColor: Colors.green,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: widget.onBack,
-              ),
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
+      child: SizedBox(
+        height: Get.height,
+        width: Get.width,
+        child: Stack(
+          children: [
+            AnimatedPositioned(
+              bottom: _locationBy == LocationBy.map ? 0 : Get.width,
+              child: _locationByMap(),
+              duration: _animationDuration,
             ),
-          ),
-        ],
+            AnimatedPositioned(
+              top: _locationBy == LocationBy.place ? 0 : Get.height,
+              duration: _animationDuration,
+              child: _locationByPlace(),
+            ),
+            Positioned(
+              left: 8,
+              top: 8,
+              child: HomeBackButton(onTap: widget.onBack),
+            ),
+            // Positioned(
+            //   top: 10,
+            //   left: 10,
+            //   child: CircleAvatar(
+            //     radius: 25.0,
+            //     backgroundColor: context.theme.colorScheme.primary.withOpacity(0),
+            //     child: IconButton(
+            //       icon: Icon(Icons.arrow_back, color: context.theme.colorScheme.primary),
+            //       onPressed: widget.onBack,
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
       ),
     );
   }
 
   AnimatedContainer _locationByPlace() {
     return AnimatedContainer(
-      decoration: const BoxDecoration(color: Colors.white),
+      decoration: BoxDecoration(color: context.theme.colorScheme.surface),
       height: Get.height,
       width: Get.width,
       duration: _animationDuration,
       child: Column(
         children: [
-          const VerticalSpacer(),
+          const VerticalSpacer(space: 10),
           _sectionTitle(),
           const VerticalSpacer(),
           Row(
@@ -103,15 +114,12 @@ class _SetLocationState extends State<SetLocation> {
                   child: TextFormField(
                     focusNode: _fieldNode,
                     controller: _fieldController,
-                    cursorHeight: 10,
                     decoration: InputDecoration(
                       labelText: widget.title,
-                      labelStyle: const TextStyle(color: Colors.green),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                     ),
                     onChanged: (value) {
-                      var userLoc =
-                          Get.find<NewTripBookingController>().currentLatLng;
+                      var userLoc = Get.find<NewTripBookingController>().currentLatLng;
 
                       _searchPlaceBouncer.run(() {
                         var placeController = PlaceController();
@@ -134,28 +142,35 @@ class _SetLocationState extends State<SetLocation> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: FullOutlinedTextButton(
+            child: OutlinedButton(
               onPressed: () {
                 _fieldNode.unfocus();
                 setState(() {
                   _locationBy = LocationBy.map;
                 });
               },
-              text: 'Open on Map',
+              child: const Text('Open on Map'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: Size(Get.width, 50),
+              ),
             ),
           ),
           const VerticalSpacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: FullTextButton(
-              text: 'Continue',
+            child: TextButton(
+              child: const Text('Continue'),
               onPressed: widget.onContinue,
+              style: TextButton.styleFrom(
+                minimumSize: Size(Get.width, 50),
+              ),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: places.length,
+              itemCount: places.length + 1,
               itemBuilder: (context, index) {
+                if (index == places.length) return const VerticalSpacer(space: 16);
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 3.0),
                   child: Column(
@@ -168,25 +183,19 @@ class _SetLocationState extends State<SetLocation> {
                         leading: Container(
                           height: 25,
                           width: 25,
-                          child: const Icon(
+                          child: Icon(
                             Icons.place,
-                            color: Colors.white,
+                            color: context.theme.colorScheme.onTertiary,
                             size: 15.0,
                           ),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.grey.shade700,
+                            color: context.theme.colorScheme.tertiary,
                           ),
                         ),
-                        title: Text(
-                          places[index].name,
-                          style: AppTextStyle.title,
-                        ),
+                        title: Text(places[index].name),
                         horizontalTitleGap: 1.0,
-                        subtitle: Text(
-                          places[index].address,
-                          style: AppTextStyle.subtitle,
-                        ),
+                        subtitle: Text(places[index].address),
                       ),
                       const Divider(height: 0.5),
                     ],
@@ -202,49 +211,56 @@ class _SetLocationState extends State<SetLocation> {
 
   Container _locationByMap() {
     return Container(
-      height: 200,
+      height: ResponsiveSize.height(100),
       width: Get.width,
       padding: const EdgeInsets.all(16.0),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.elliptical(400, 90),
+      decoration: BoxDecoration(
+        color: context.theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(20.0),
         ),
       ),
       child: Column(
         children: <Widget>[
           _sectionTitle(),
           const VerticalSpacer(),
-          FullOutlinedTextButton(
-            text: 'Set',
+          OutlinedButton(
+            child: const Text('Set'),
             onPressed: () async {
               var logic = Get.find<NewTripBookingController>();
               widget.onLocationSelectedByMap();
-              logic
-                  .getAddressFromLatLng(logic.currentCameraLatLng)
-                  .then((value) {
+              logic.getAddressFromLatLng(logic.currentCameraLatLng).then((value) {
                 _fieldController.text = value as String;
               });
             },
+            style: OutlinedButton.styleFrom(
+              minimumSize: Size(Get.width, 50),
+            ),
           ),
           const VerticalSpacer(),
           Row(
             children: [
               Expanded(
-                child: FullTextButton(
-                  text: 'Location by place',
+                child: TextButton(
+                  child: const Text('Location by place'),
                   onPressed: () {
                     setState(() {
                       _locationBy = LocationBy.place;
                     });
                   },
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(Get.width, 50),
+                  ),
                 ),
               ),
               const HorizontalSpacer(),
               Expanded(
-                child: FullTextButton(
-                  text: 'Continue',
+                child: TextButton(
+                  child: const Text('Continue'),
                   onPressed: widget.onContinue,
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(Get.width, 50),
+                  ),
                 ),
               ),
             ],
@@ -258,7 +274,7 @@ class _SetLocationState extends State<SetLocation> {
     return Center(
       child: Text(
         '${widget.title} Location',
-        style: GoogleFonts.catamaran(
+        style: AppTextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16.0,
         ),

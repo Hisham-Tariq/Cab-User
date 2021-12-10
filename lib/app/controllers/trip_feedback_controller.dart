@@ -33,5 +33,5 @@ class TripFeedbackController extends GetxController {
     Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING);
   }
 
-  closeRating() => Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING);
+  closeRating() => Get.offAllNamed(AppRoutes.HOME);
 }

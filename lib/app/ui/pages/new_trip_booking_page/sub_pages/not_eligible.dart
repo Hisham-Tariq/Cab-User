@@ -10,30 +10,29 @@ class NotEligibleForBooking extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 220,
       child: Container(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.fromLTRB(20.0, 20, 20, 0),
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(30.0),
             ),
             boxShadow: [
               BoxShadow(
                 offset: const Offset(0, -3),
-                color: Colors.grey.shade400,
-                blurRadius: 15.0,
-                spreadRadius: 2.0,
+                color: context.theme.colorScheme.onInverseSurface,
+                blurRadius: 230.0,
+                spreadRadius: 1.0,
               ),
             ]),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
+            const Center(
               child: Text(
                 'Not Eligible',
-                style: GoogleFonts.catamaran(
+                style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.w900,
                 ),

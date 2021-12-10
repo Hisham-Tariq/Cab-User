@@ -2,12 +2,13 @@
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../routes/app_routes.dart';
+import '../ui/utils/utils.dart';
 import 'user_controller.dart';
 class LocationAccessController extends GetxController {
 
   Future<bool> requestLocaionPermission() async {
     if (!(await Permission.locationWhenInUse.request().isGranted)) {
-      Get.snackbar(
+      showAppSnackBar(
         'Location',
         'Location permission must be granted in order to use the app',
       );

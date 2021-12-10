@@ -1,7 +1,9 @@
+export 'booked_trip_controller.dart';
 export 'contact_controller.dart';
 export 'direction_controller.dart';
 export 'home_controller.dart';
 export 'introduction_controller.dart';
+export 'location_access_controller.dart';
 export 'main_controller.dart';
 export 'navigation_controller.dart';
 export 'new_trip_booking_controller.dart';
@@ -9,6 +11,7 @@ export 'otp_controller.dart';
 export 'phone_input_controller.dart';
 export 'place_controller.dart';
 export 'splash_controller.dart';
+export 'theme_controller.dart';
 export 'trip_feedback_controller.dart';
 export 'unknown_route_controller.dart';
 export 'user_controller.dart';

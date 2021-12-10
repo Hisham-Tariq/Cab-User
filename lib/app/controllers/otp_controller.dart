@@ -43,7 +43,7 @@ class OtpController extends GetxController {
       Get.offAllNamed(AppRoutes.USER_INFO);
     } else {
       var controller = Get.find<UserController>();
-      controller.readCurrentUser().then((_) => Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING));
+      controller.readCurrentUser().then((_) => Get.offAllNamed(AppRoutes.HOME));
     }
   }
 

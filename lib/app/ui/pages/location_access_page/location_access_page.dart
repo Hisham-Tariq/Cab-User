@@ -1,10 +1,13 @@
 import 'package:driving_app_its/app/ui/generated/assets.dart';
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
+import 'package:driving_app_its/app/ui/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../controllers/location_access_controller.dart';
+import '../../theme/text_theme.dart';
 
 class LocationAccessPage extends GetView<LocationAccessController> {
   const LocationAccessPage({Key? key}) : super(key: key);
@@ -16,33 +19,30 @@ class LocationAccessPage extends GetView<LocationAccessController> {
         child: Column(
           children: [
             const VerticalSpacer(),
-            AspectRatio(
-              aspectRatio: 3.5 / 4,
-              child: SvgPicture.asset(
-                Assets.svgLocation,
-              ),
+            SvgPicture.asset(
+              Assets.svgLocation,
+              height: ResponsiveSize.height(150),
             ),
-            const VerticalSpacer(space: 32.0),
-            const Text(
+            const VerticalSpacer(space: 12),
+            Text(
               'Location Services',
-              style: TextStyle(
+              style: AppTextStyle(
                 fontWeight: FontWeight.w900,
-                fontSize: 18.0,
+                fontSize: 24.0,
               ),
             ),
-            const VerticalSpacer(space: 20.0),
+            const VerticalSpacer(space: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
                 'We need to know where you are in order to provide you fast cab service',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
+                style: AppTextStyle(
                   fontSize: 14.0,
                 ),
               ),
             ),
-            const VerticalSpacer(space: 48.0),
+            const VerticalSpacer(space: 12),
             TextButton(
               child: const Text('Grant Access'),
               onPressed: controller.handleGrantAcess,

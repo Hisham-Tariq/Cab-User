@@ -1,13 +1,12 @@
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 import 'package:driving_app_its/app/ui/pages/new_trip_booking_page/widgets/widgets.dart';
 
-import '../../../customization/customization.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
 class BookingDone extends StatelessWidget {
-  const BookingDone({Key? key, required this.tripInfo, required this.onBack})
-      : super(key: key);
+  const BookingDone({Key? key, required this.tripInfo, required this.onBack}) : super(key: key);
   final Map<String, String> tripInfo;
   final Callback onBack;
 
@@ -40,27 +39,24 @@ class BookingDone extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child:
-                        Text('Trip Detail', style: AppTextStyle.primaryHeading),
+                    child: Text('Trip Detail'),
                   ),
                   const VerticalSpacer(space: 16),
                   Row(
                     children: [
-                      const Text('Pickup: ', style: AppTextStyle.emphasisTitle),
+                      const Text('Pickup: '),
                       const HorizontalSpacer(),
-                      Text(tripInfo['pickup'] as String,
-                          style: AppTextStyle.normal),
+                      Text(tripInfo['pickup'] as String),
                     ],
                   ),
                   const VerticalSpacer(),
                   Row(
                     children: [
-                      const Text('Destination: ', style: AppTextStyle.emphasisTitle),
+                      const Text('Destination: '),
                       const HorizontalSpacer(),
                       Expanded(
                         child: SingleChildScrollView(
-                          child: Text(tripInfo['destination'] as String,
-                              style: AppTextStyle.normal),
+                          child: Text(tripInfo['destination'] as String),
                         ),
                       ),
                     ],
@@ -68,23 +64,27 @@ class BookingDone extends StatelessWidget {
                   const VerticalSpacer(),
                   Row(
                     children: [
-                      const Text('Distance: ', style: AppTextStyle.emphasisTitle),
+                      const Text('Distance: '),
                       const HorizontalSpacer(),
-                      Text(tripInfo['distance'] as String,
-                          style: AppTextStyle.normal),
+                      Text(tripInfo['distance'] as String),
                     ],
                   ),
                   const VerticalSpacer(),
                   Row(
                     children: [
-                      const Text('Duration: ', style: AppTextStyle.emphasisTitle),
+                      const Text('Duration: '),
                       const HorizontalSpacer(),
-                      Text(tripInfo['duration'] as String,
-                          style: AppTextStyle.normal),
+                      Text(tripInfo['duration'] as String),
                     ],
                   ),
                   Expanded(child: Container()),
-                  FullTextButton(onPressed: () {}, text: 'Book Now')
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('Book Now'),
+                    style: TextButton.styleFrom(
+                      minimumSize: Size(Get.width, 50)
+                    ),
+                  )
                 ],
               ),
             ),

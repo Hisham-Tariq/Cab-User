@@ -2,7 +2,6 @@ import 'package:driving_app_its/app/controllers/controllers.dart';
 import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 import 'package:driving_app_its/app/ui/pages/new_trip_booking_page/widgets/widgets.dart';
 
-import '../../../customization/customization.dart';
 import '../../../generated/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../theme/text_theme.dart';
+import '../../../utils/utils.dart';
 
 enum VehicleType { rickshaw, bike, car }
 // At What stage of Chosing Vehicle is
@@ -19,9 +20,7 @@ enum VehicleType { rickshaw, bike, car }
 
 // ignore: must_be_immutable
 class ChoseVehicle extends StatelessWidget {
-  ChoseVehicle(
-      {Key? key, required this.onBack, required this.onVehicleSelected})
-      : super(key: key);
+  ChoseVehicle({Key? key, required this.onBack, required this.onVehicleSelected}) : super(key: key);
   final Function onVehicleSelected;
   final Callback onBack;
 
@@ -51,14 +50,14 @@ class ChoseVehicle extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12.0),
-                  height: 350,
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  // height: 350,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0)),
+                    color: context.theme.colorScheme.surface,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20.0),
+                    ),
                   ),
                   child: GetBuilder<NewTripBookingController>(
                     init: NewTripBookingController(),
@@ -67,17 +66,23 @@ class ChoseVehicle extends StatelessWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _showInfo(
-                              'Distance', logic.tripDirections!.totalDistance),
-                          _showInfo('Expected Time',
-                              logic.tripDirections!.totalDuration),
-                          Text(
-                            'Chose Vehicle',
-                            style: AppTextStyle.primaryHeading.copyWith(
-                              color: Colors.black,
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                'Chose Vehicle',
+                                style: AppTextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  color: context.theme.colorScheme.primary,
+                                  fontSize: ResponsiveSize.height(9),
+                                ),
+                              ),
                             ),
                           ),
-                          const VerticalSpacer(space: 16),
+                          const VerticalSpacer(space: 4),
+                          _showInfo('Distance', logic.tripDirections!.totalDistance, context),
+                          _showInfo('Expected Time', logic.tripDirections!.totalDuration, context),
+                          const VerticalSpacer(space: 6),
                           vehicleTypeWidget(),
                         ],
                       );
@@ -92,24 +97,24 @@ class ChoseVehicle extends StatelessWidget {
     );
   }
 
-  RichText _showInfo(title, value) {
+  RichText _showInfo(title, value, BuildContext context) {
     return RichText(
       text: TextSpan(
         text: '',
         children: [
           TextSpan(
             text: '$title: ',
-            style: GoogleFonts.catamaran(
-              color: Colors.green,
-              fontSize: 18.0,
-              fontWeight: FontWeight.w500,
+            style: AppTextStyle(
+              color: context.theme.colorScheme.primary,
+              fontSize: ResponsiveSize.height(7),
+              fontWeight: FontWeight.w900,
             ),
           ),
           TextSpan(
             text: value,
-            style: GoogleFonts.catamaran(
-              color: Colors.black,
-              fontSize: 16.0,
+            style: AppTextStyle(
+              color: context.theme.colorScheme.onSurface,
+              fontSize: ResponsiveSize.height(6),
             ),
           ),
         ],
@@ -122,9 +127,7 @@ class ChoseVehicle extends StatelessWidget {
     var vehiclePrices = controller.prices![key];
     var surgeBoost = controller.prices!['surgeBoost'];
     return ((vehiclePrices['baseFare'] +
-            ((vehiclePrices['costPerMin'] * controller.tripDurationInMins) +
-                    (vehiclePrices['costPerKm'] * controller.tripDistance)) *
-                surgeBoost +
+            ((vehiclePrices['costPerMin'] * controller.tripDurationInMins) + (vehiclePrices['costPerKm'] * controller.tripDistance)) * surgeBoost +
             vehiclePrices['bookingFee']) as double)
         .toInt();
   }
@@ -145,7 +148,7 @@ class ChoseVehicle extends StatelessWidget {
           vehicleSvgPath: Assets.svgRickshaw,
           price: calculatePrice('rickshaw'),
         ),
-        const VerticalSpacer(),
+        const VerticalSpacer(space: 3),
         VehicleTile(
           title: 'Bike',
           desc: 'Affordable rides, All to yourself',
@@ -159,7 +162,7 @@ class ChoseVehicle extends StatelessWidget {
           vehicleSvgPath: Assets.svgBike,
           price: calculatePrice('bike'),
         ),
-        const VerticalSpacer(),
+        const VerticalSpacer(space: 3),
         VehicleTile(
           title: 'Car',
           desc: 'Safe and comfortable rides',
@@ -199,12 +202,22 @@ class VehicleTile extends StatelessWidget {
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(4.0),
+        boxShadow: [
+          BoxShadow(
+            offset: Offset.zero,
+            blurRadius: 2.0,
+            blurStyle: BlurStyle.inner,
+            spreadRadius: 0.5,
+            color: context.theme.colorScheme.inverseSurface,
+          ),
+        ],
       ),
       child: Material(
         child: ListTile(
-          contentPadding: EdgeInsets.zero,
-          tileColor: Colors.grey.shade100,
+          // contentPadding: EdgeInsets.zero,
+          minVerticalPadding: 24.0,
+          tileColor: context.theme.colorScheme.surfaceVariant,
           leading: Container(
             height: double.infinity,
             width: 60.0,
@@ -216,16 +229,22 @@ class VehicleTile extends StatelessWidget {
           ),
           trailing: Padding(
             padding: const EdgeInsets.only(right: 12.0),
-            child: Text('Rs. $price'),
-          ),
-          title: Text(title),
-          onTap: onTap,
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(
-              width: 1.0,
+            child: Text(
+              'Rs. $price',
+              style: AppTextStyle(
+                color: context.theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-            borderRadius: BorderRadius.circular(8.0),
           ),
+          title: Text(
+            title,
+            style: AppTextStyle(
+              fontSize: 15.0,
+              fontWeight: FontWeight.normal,
+              color: context.theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          onTap: onTap,
         ),
       ),
     );

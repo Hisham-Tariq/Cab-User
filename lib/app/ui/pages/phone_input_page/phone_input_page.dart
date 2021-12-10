@@ -1,4 +1,3 @@
-import 'package:driving_app_its/app/ui/customization/customization.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
@@ -7,6 +6,7 @@ import '../../global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/controllers.dart';
+import '../../theme/text_theme.dart';
 
 class PhoneInputPage extends GetView<PhoneInputController> {
   const PhoneInputPage({Key? key}) : super(key: key);
@@ -14,20 +14,19 @@ class PhoneInputPage extends GetView<PhoneInputController> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
+      onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
         body: SafeArea(
           child: Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Column(
                 children: [
-                  const SizedBox(height: 120),
+                  const VerticalSpacer(space: 40),
                   const AppName(),
                   const AppTagLine(),
-                  const SizedBox(height: 100),
+                  const VerticalSpacer(space: 30),
                   Form(
                     key: controller.formKey,
                     child: Column(
@@ -35,59 +34,60 @@ class PhoneInputPage extends GetView<PhoneInputController> {
                       children: [
                         Text(
                           'Phone Number',
-                          style: GoogleFonts.catamaran(
-                            color: Colors.black45,
-                            fontSize: 14,
-                          ),
+                          style: AppTextStyle(fontSize: 14),
                         ),
-                        const SizedBox(height: 4),
+                        const VerticalSpacer(),
                         TextFormField(
                           focusNode: controller.phoneFocusNode,
                           controller: controller.phoneController,
-                          decoration:
-                              const InputDecoration(hintText: '03XXXXXXXXX'),
+                          decoration: const InputDecoration(hintText: '03XXXXXXXXX'),
                           validator: controller.validatePhoneNumber,
                         ),
-                        const SizedBox(height: 4),
+                        const VerticalSpacer(),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Expanded(
                               child: Obx(
                                 () => ProgressButton.icon(
-                                  iconedButtons: const {
+                                  textStyle: AppTextStyle(
+                                    color: context.theme.colorScheme.onPrimary,
+                                  ),
+                                  iconedButtons: {
                                     ButtonState.idle: IconedButton(
                                       text: "Continue",
-                                      icon: Icon(Icons.arrow_forward,
-                                          color: Colors.white),
-                                      color: AppColors.primary,
+                                      icon: Icon(
+                                        Icons.arrow_forward,
+                                        color: context.theme.colorScheme.onPrimary,
+                                      ),
+                                      color: context.theme.colorScheme.primary,
                                     ),
                                     ButtonState.loading: IconedButton(
                                       text: "Loading",
-                                      color: AppColors.primary,
+                                      color: context.theme.colorScheme.primary,
                                     ),
                                     ButtonState.fail: IconedButton(
                                       text: "Failed",
-                                      icon: Icon(Icons.cancel,
-                                          color: Colors.white),
-                                      color: AppColors.error,
+                                      icon: Icon(
+                                        Icons.cancel,
+                                        color: context.theme.colorScheme.onError,
+                                      ),
+                                      color: context.theme.colorScheme.error,
                                     ),
                                     ButtonState.success: IconedButton(
                                       text: "Success",
                                       icon: Icon(
                                         Icons.check_circle,
-                                        color: Colors.white,
+                                        color: context.theme.colorScheme.onPrimary,
                                       ),
-                                      color: AppColors.primary,
+                                      color: context.theme.colorScheme.primary,
                                     )
                                   },
                                   onPressed: controller.verifyPhoneNumber,
                                   state: controller.buttonState.value,
-                                  progressIndicator:
-                                      const CircularProgressIndicator(
+                                  progressIndicator: CircularProgressIndicator(
                                     backgroundColor: Colors.white,
-                                    valueColor:
-                                        AlwaysStoppedAnimation(Colors.green),
+                                    valueColor: AlwaysStoppedAnimation(context.theme.colorScheme.primary),
                                   ),
                                 ),
                               ),

@@ -14,6 +14,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:collection/collection.dart';
+import '../ui/theme/text_theme.dart';
 import 'booked_trip_controller.dart';
 import 'direction_controller.dart';
 import 'dart:math' show cos, sqrt, asin, pi, sin;
@@ -30,7 +31,7 @@ class NewTripBookingController extends GetxController {
   var currentBookingState = BookingState.idle;
   Position? currentPosition;
   CameraPosition? initialCameraPosition;
-  late GoogleMapController googleMapController;
+  GoogleMapController? googleMapController;
   LatLng? currentCameraLatLng;
   LatLng? pickupLatLng;
   String? pickupAddress;
@@ -49,8 +50,6 @@ class NewTripBookingController extends GetxController {
   String? selectedVehicle;
 
   var currentCameraPosDebouncer = Debouncer(miliseconds: 400);
-
-  final scaf = GlobalKey<ScaffoldState>();
 
   int totalPrice = 0;
 
@@ -280,7 +279,12 @@ class NewTripBookingController extends GetxController {
         if (Get.isDialogOpen!) Get.back();
         if (requestNearbyRider._availableRiders.length < 1) {
           "No Rider is available".printInfo();
-          Get.snackbar('Riders', 'No rider available right now try again later');
+          showAppSnackBar(
+            'Rider',
+            'No Rider is available right now',
+            null,
+            Icons.person_off,
+          );
           nearbyRidersStream!.cancel();
         }
       });
@@ -336,7 +340,7 @@ class NewTripBookingController extends GetxController {
     requestNearbyRider = RequestNearbyRider(tripId, onRiderAcceptTrip);
     _createNewTripInstance(tripId);
 
-    _loadingDialog('Searching Riders');
+    Get.dialog(const LoadingDialog('Searching Riders'));
 
     availableRidersLocation = {};
     _initializeNearbyRiderListener(tripId);
@@ -364,7 +368,9 @@ class NewTripBookingController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    googleMapController.dispose();
+    if(googleMapController != null ) {
+      googleMapController!.dispose();
+    }
   }
 }
 
@@ -453,7 +459,12 @@ class RequestNearbyRider {
       if (Get.isDialogOpen as bool) {
         Get.back();
       }
-      Get.snackbar('Ride', 'Rider Successfully accepted the trip');
+      showAppSnackBar(
+        'Ride',
+        'Rider Successfully accepted the trip',
+        null,
+        Icons.check_circle,
+      );
       //  Rider have accepted the ride
       if (await onRiderAcceptTrip(tripId, riderId)) {
         printInfo(info: 'Successfully Added booking');
@@ -468,7 +479,7 @@ class RequestNearbyRider {
   void start() async {
     if (!_isRequestingStarted) {
       if (Get.isDialogOpen!) Get.back();
-      _loadingDialog('Finding Nearest Rider Available');
+      Get.dialog(const LoadingDialog('Finding Nearest Rider Available'));
       _isRequestingStarted = true;
       printInfo(info: 'Requesting to Riders have been Started');
     }
@@ -489,19 +500,27 @@ class RequestNearbyRider {
       if (Get.isDialogOpen as bool) {
         Get.back();
       }
-      Get.snackbar('Rider', 'No Rider is available right now');
+      showAppSnackBar(
+        'Rider',
+        'No Rider is available right now',
+        null,
+        Icons.person_off,
+      );
       //  Remove the extra data from the Firestore
     }
   }
 }
 
-_loadingDialog(title) {
-  Get.dialog(
-    Dialog(
-      child: Container(
+class LoadingDialog extends StatelessWidget {
+  const LoadingDialog(this.title, {Key? key}) : super(key: key);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: SizedBox(
         height: 200,
         width: 300,
-        color: Colors.white,
         child: Column(
           children: [
             SizedBox(
@@ -509,7 +528,7 @@ _loadingDialog(title) {
               child: Center(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: AppTextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -524,6 +543,6 @@ _loadingDialog(title) {
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }

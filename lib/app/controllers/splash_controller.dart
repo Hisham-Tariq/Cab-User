@@ -7,7 +7,10 @@ class SplashController extends GetxController {
   @override
   onInit() async {
     super.onInit();
-    (await isLocationPermissionGranted()).printInfo();
+    // await Future.delayed(const Duration(seconds: 2));
+    // Get.offAllNamed(AppRoutes.LOCATION_ACCESS);
+    // return;
+    //(await isLocationPermissionGdurationranted()).printInfo();
     if (await isLocationPermissionGranted()) {
       var controller = Get.find<UserController>();
       if (controller.isUserNotLoggedIn) {
@@ -17,7 +20,7 @@ class SplashController extends GetxController {
         controller.userWithPhoneNumberIsExist(controller.userPhoneNumber).then((value) {
           if (value) {
             controller.readCurrentUser().then((_) {
-              Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING);
+              Get.offAllNamed(AppRoutes.HOME);
             });
           } else {
             //  Rider didn't provide his Details

@@ -1,3 +1,5 @@
+import 'package:driving_app_its/app/ui/layouts/app/home_layout.dart';
+
 import '../bindings/location_access_binding.dart';
 import '../ui/pages/location_access_page/location_access_page.dart';
 import '../bindings/bindings.dart';
@@ -24,12 +26,12 @@ class AppPages {
 
   static final List<GetPage> pages = [
     unknownRoutePage,
-    // GetPage(
-    //   name: AppRoutes.HOME,
-    //   page: () => HomePage(),
-    //   binding: HomeBinding(),
-    //   transition: _defaultTransition,
-    // ),
+    GetPage(
+      name: AppRoutes.HOME,
+      page: () => HomeLayout(),
+      binding: HomeBinding(),
+      transition: _defaultTransition,
+    ),
     GetPage(
       name: AppRoutes.SPLASH,
       page: () => const SplashPage(),

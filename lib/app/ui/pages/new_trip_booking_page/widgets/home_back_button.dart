@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:get/get_utils/src/extensions/context_extensions.dart';
 
 class HomeBackButton extends StatelessWidget {
   const HomeBackButton({Key? key, required this.onTap}) : super(key: key);
@@ -13,10 +14,13 @@ class HomeBackButton extends StatelessWidget {
       child: Container(
         height: 40,
         width: 40,
-        child: const Icon(Icons.arrow_back, color: Colors.white),
-        decoration: const BoxDecoration(
+        child: Icon(
+          Icons.arrow_back,
+          color: context.theme.colorScheme.onPrimary,
+        ),
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.green,
+          color: context.theme.colorScheme.primary,
         ),
       ),
     );

@@ -2,16 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driving_app_its/app/controllers/controllers.dart';
 import 'package:driving_app_its/app/routes/app_routes.dart';
 import 'package:driving_app_its/app/ui/generated/assets.dart';
-import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
+import 'package:driving_app_its/app/ui/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_dialogs/material_dialogs.dart';
-// import 'package:material_dialogs/widgets/buttons/icon_button.dart';
-// import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
-
-
 
 Future<void> firebaseBackgroundMessageHandler(RemoteMessage message) async {}
 
@@ -29,10 +25,9 @@ void handleConfirmUserTripHasStarted(RemoteMessage message) {
       ),
       context: Get.context as BuildContext,
       actions: [
-        FullTextButton(
+        TextButton(
           onPressed: () {
-            print(
-                'Booking Id: ${Get.find<UserController>().user.currentBooking}');
+            print('Booking Id: ${Get.find<UserController>().user.currentBooking}');
             FirebaseFirestore.instance
                 .collection('BookedTrips')
                 .doc(Get.find<UserController>().user.currentBooking)
@@ -42,9 +37,9 @@ void handleConfirmUserTripHasStarted(RemoteMessage message) {
             // updateTheRiderResponse(true, message.data['tripId']);
             navigator!.pop();
           },
-          text: 'Yes',
+          child: const Text('Yes'),
         ),
-        FullOutlinedTextButton(
+        OutlinedButton(
           onPressed: () {
             FirebaseFirestore.instance
                 .collection('BookedTrips')
@@ -55,8 +50,12 @@ void handleConfirmUserTripHasStarted(RemoteMessage message) {
             // updateTheRiderResponse(true, message.data['tripId']);
             navigator!.pop();
           },
-          text: 'No',
-          buttonColor: Colors.red,
+          child: const Text('No'),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: Get.context!.theme.colorScheme.error),
+            primary: Get.context!.theme.colorScheme.error,
+            minimumSize: Size(Get.width, 50),
+          ),
         )
       ]);
 }
@@ -73,7 +72,7 @@ void handleConfirmUserTripHasEnded(RemoteMessage message) {
       ),
       context: Get.context as BuildContext,
       actions: [
-        FullTextButton(
+        TextButton(
           onPressed: () async {
             await FirebaseFirestore.instance
                 .collection('BookedTrips')
@@ -81,14 +80,19 @@ void handleConfirmUserTripHasEnded(RemoteMessage message) {
                 .collection('response')
                 .doc('end')
                 .update({'response': true});
-            Get.snackbar('Ride', 'Ride successfully completed');
+            showAppSnackBar(
+              'Ride',
+              'Ride Successfully completed',
+              null,
+              Icons.add_task,
+            );
             // updateTheRiderResponse(true, message.data['tripId']);
             navigator!.pop();
             Get.toNamed(AppRoutes.TRIP_FEEDBACK);
           },
-          text: 'Yes',
+          child: Text('Yes'),
         ),
-        FullOutlinedTextButton(
+        OutlinedButton(
           onPressed: () {
             FirebaseFirestore.instance
                 .collection('BookedTrips')
@@ -99,17 +103,24 @@ void handleConfirmUserTripHasEnded(RemoteMessage message) {
             // updateTheRiderResponse(true, message.data['tripId']);
             navigator!.pop();
           },
-          text: 'No',
-          buttonColor: Colors.red,
+          child: const Text('No'),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: Get.context!.theme.colorScheme.error),
+            primary: Get.context!.theme.colorScheme.error,
+            minimumSize: Size(Get.width, 50),
+          ),
         )
       ]);
 }
 
 firebaseForegroundMessage(RemoteMessage message) {
-  print(message.notification!.body);
-  Get.snackbar('Notification', message.notification!.body as String);
-  if (message.data.containsKey('funName') &&
-      FirebaseAuth.instance.currentUser != null) {
+  showAppSnackBar(
+    'Notification',
+    message.notification!.body as String,
+    null,
+    Icons.notifications_active,
+  );
+  if (message.data.containsKey('funName') && FirebaseAuth.instance.currentUser != null) {
     switch (message.data['funName']) {
       case 'notifyTheUserAboutHisTripRiderResponse':
         handleResponseReceivedAboutNewTripFromRider(message);
@@ -126,8 +137,7 @@ firebaseForegroundMessage(RemoteMessage message) {
 
 firebaseOnMessageClicked(RemoteMessage message) {
   print(message.notification!.title);
-  if (message.data.containsKey('funName') &&
-      FirebaseAuth.instance.currentUser != null) {
+  if (message.data.containsKey('funName') && FirebaseAuth.instance.currentUser != null) {
     print(message.notification!.title);
     switch (message.data['funName']) {
       case 'notifyTheUserAboutHisTripRiderResponse':

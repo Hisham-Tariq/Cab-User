@@ -1,4 +1,3 @@
-import 'package:driving_app_its/app/ui/customization/customization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -11,7 +10,6 @@ class CurrentTimeField extends StatelessWidget {
     return Expanded(
       child: TextFormField(
         enabled: false,
-        style: AppTextStyle.disabledTextField,
         decoration: const InputDecoration(
           contentPadding: EdgeInsets.only(left: 30.0),
         ),

@@ -1,3 +1,4 @@
+import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/controllers.dart';
@@ -7,12 +8,11 @@ class ContactPage extends GetView<ContactController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Contact Us'),
-        centerTitle: true,
-        backgroundColor: Colors.green,
-        elevation: 0.0,
+    return const Material(
+      child: Center(
+        child: Text(
+          "Contact Us",
+        ),
       ),
     );
   }
