@@ -50,6 +50,7 @@ dependencies:
   dartz: ^0.10.0
   json_serializable: ^6.1.1
   rxdart: ^0.27.2
+  in_app_review: ^2.0.3
 
 dev_dependencies:
   flutter_test:

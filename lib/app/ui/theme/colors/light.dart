@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'theme_colors.dart';
+import 'colors_interface.dart';
 
 class LightThemeColors extends ThemeColors {
   @override

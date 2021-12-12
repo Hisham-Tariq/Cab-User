@@ -12,6 +12,7 @@ class PhoneInputPage extends GetView<PhoneInputController> {
 
   @override
   Widget build(BuildContext context) {
+    
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
@@ -35,7 +36,7 @@ class PhoneInputPage extends GetView<PhoneInputController> {
                           'Phone Number',
                           style: AppTextStyle(fontSize: 14),
                         ),
-                        const VerticalSpacer(),
+                        const HorizontalSpacer(),
                         TextFormField(
                           focusNode: controller.phoneFocusNode,
                           controller: controller.phoneController,

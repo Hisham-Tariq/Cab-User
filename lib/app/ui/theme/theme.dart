@@ -1,9 +1,6 @@
-export 'common_theme.dart';
-export 'light_theme.dart';
-export 'dark_theme.dart';
-
+export 'colors/colors.dart';
 import 'package:flutter/material.dart';
-import 'base_theme.dart';
+import 'theme_data.dart';
 
 import 'theme.dart';
 

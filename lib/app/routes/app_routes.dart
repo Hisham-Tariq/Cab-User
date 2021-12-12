@@ -14,4 +14,7 @@ class AppRoutes {
   static const CONTACT = '/contact';
   static const TRIP_FEEDBACK = '/trip-feedback';
   static const LOCATION_ACCESS = '/location-access';
+  static const MY_TRIPS = '/my-trips';
+  static const HELP_US = '/help-us';
+  static const MY_TRIPS_DETAIL = '/my-trips-detail';
 }

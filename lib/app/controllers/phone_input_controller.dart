@@ -1,6 +1,7 @@
 import 'package:driving_app_its/app/controllers/user_controller.dart';
 import 'package:driving_app_its/app/routes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -41,8 +42,7 @@ class PhoneInputController extends GetxController {
       changeToErrorState();
       return false;
     } else if (!isNewUser && !isExist) {
-      Fluttertoast.showToast(
-          msg: "Rider doesn't exist, please get yourself register");
+      Fluttertoast.showToast(msg: "Rider doesn't exist, please get yourself register");
       changeToErrorState();
       return false;
     }
@@ -54,9 +54,7 @@ class PhoneInputController extends GetxController {
       Get.offAllNamed(AppRoutes.USER_INFO);
     } else {
       var controller = Get.find<UserController>();
-      controller
-          .readCurrentUser()
-          .then((_) => Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING));
+      controller.readCurrentUser().then((_) => Get.offAllNamed(AppRoutes.NEW_TRIP_BOOKING));
     }
   }
 
@@ -64,15 +62,13 @@ class PhoneInputController extends GetxController {
     phoneFocusNode.unfocus();
     if (!formKey.currentState!.validate()) return;
     changeToLoadingState();
-    var isExist =
-        await _userController.userWithPhoneNumberIsExist(formatedPhoneNumber);
+    var isExist = await _userController.userWithPhoneNumberIsExist(formatedPhoneNumber);
     if (isNewUser && isExist) {
       Fluttertoast.showToast(msg: 'User already exist, Try to login');
       changeToErrorState();
       return;
     } else if (!isNewUser && !isExist) {
-      Fluttertoast.showToast(
-          msg: 'User doesn\'t exist, Please get yourself register');
+      Fluttertoast.showToast(msg: 'User doesn\'t exist, Please get yourself register');
       changeToErrorState();
       return;
       // User try to login without first registering the phone number

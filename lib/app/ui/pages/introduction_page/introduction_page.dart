@@ -1,5 +1,4 @@
 import '../../../routes/app_routes.dart';
-
 import '../../global_widgets/global_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,7 +37,7 @@ class IntroductionPage extends GetView<IntroductionController> {
                   child: const Text('Register'),
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size(Get.width, 50),
-                    primary: ThemeController.CurrentTheme(context).primary,
+                    primary: context.theme.colorScheme.primary,
                   ),
                 ),
                 const VerticalSpacer(),

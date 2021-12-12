@@ -1,3 +1,9 @@
+import '../bindings/my_trips_detail_binding.dart';
+import '../ui/pages/my_trips_detail_page/my_trips_detail_page.dart';
+import '../bindings/help_us_binding.dart';
+import '../ui/pages/help_us_page/help_us_page.dart';
+import '../bindings/my_trips_binding.dart';
+import '../ui/pages/my_trips_page/my_trips_page.dart';
 import 'package:driving_app_its/app/ui/layouts/app/home_layout.dart';
 
 import '../bindings/location_access_binding.dart';
@@ -97,6 +103,24 @@ class AppPages {
       page: () => const LocationAccessPage(),
       binding: LocationAccessBinding(),
       transition: _defaultTransition,
+    ),
+    GetPage(
+      name: AppRoutes.MY_TRIPS,
+      page: () => const MyTripsPage(),
+      binding: MyTripsBinding(),
+      transition: _defaultTransition,
+    ),
+    GetPage(
+      name: AppRoutes.HELP_US,
+      page: () => const HelpUsPage(),
+      binding: HelpUsBinding(),
+      transition: _defaultTransition,
+    ),
+    GetPage(
+      name: AppRoutes.MY_TRIPS_DETAIL,
+      page: () => const MyTripsDetailPage(),
+      binding: MyTripsDetailBinding(),
+      transition: Transition.rightToLeft,
     ),
   ];
 }

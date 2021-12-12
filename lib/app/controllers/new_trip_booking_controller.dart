@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:driving_app_its/app/models/models.dart';
-import 'package:driving_app_its/app/ui/global_widgets/global_widgets.dart';
-import 'package:driving_app_its/app/ui/utils/utils.dart';
+import '../data/models/booked_trip_model/booked_trip_model.dart';
+import 'navigation_controller.dart';
+import '../models/models.dart';
+import '../ui/global_widgets/global_widgets.dart';
+import '../ui/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:collection/collection.dart';
-import '../ui/theme/text_theme.dart';
+import '../models/trip_location.model.dart';
 import 'booked_trip_controller.dart';
 import 'direction_controller.dart';
 import 'dart:math' show cos, sqrt, asin, pi, sin;
@@ -26,26 +28,15 @@ class Rider {
   String riderId;
 }
 
-//////// Booking Steps    ////////
-/// 0. Idle
-/// 1. Select Pickup Location
-/// 2. Select Destination Location
-/// 3. Select Vehicle
-/// 4. Finding Rider
-/// 5. Done
-
 class NewTripBookingController extends GetxController {
   int tripBookingStep = 0;
-  Position? currentPosition;
   CameraPosition? initialCameraPosition;
   GoogleMapController? googleMapController;
   LatLng? currentCameraLatLng;
-  LatLng? pickupLatLng;
-  String? pickupAddress;
-  LatLng? destinationLatLng;
-  String? destinationAddress;
+  TripLocationModel? pickup;
+  TripLocationModel? destination;
+
   Map<String, dynamic>? prices;
-  Map<String, Marker?> markers = {};
   Directions? tripDirections;
 
   Map<String, Marker> availableRidersLocation = {};
@@ -86,22 +77,12 @@ class NewTripBookingController extends GetxController {
   onInit() async {
     super.onInit();
     _saveDeviceToken();
-    await updateCurrentPosition();
-    currentCameraLatLng = pickupLatLng = currentLatLng;
-    pickupAddress = await getAddressFromLatLng(pickupLatLng);
+    var currentPosition = await Geolocator.getCurrentPosition();
+    currentCameraLatLng = LatLng(currentPosition.latitude, currentPosition.longitude);
     initialCameraPosition = CameraPosition(
-      target: currentLatLng as LatLng,
+      target: currentCameraLatLng!,
       zoom: 11.5,
     );
-    markers.addAll({
-      'pickup': Marker(
-        markerId: const MarkerId('pickup'),
-        infoWindow: const InfoWindow(title: 'pickup'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
-        position: currentLatLng as LatLng,
-      ),
-      'destination': null,
-    });
     fetchPrices();
     update();
   }
@@ -112,7 +93,11 @@ class NewTripBookingController extends GetxController {
   }
 
   double get tripDistance {
-    return double.parse((RegExp(r'[0-9]*\.[0-9]*').firstMatch(tripDirections!.totalDistance)!.group(0)) ?? '0.0');
+    try {
+      return double.parse((RegExp(r'[0-9]*\.[0-9]*').firstMatch(tripDirections!.totalDistance)!.group(0)) ?? '0.0');
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   int get tripDurationInMins {
@@ -137,69 +122,38 @@ class NewTripBookingController extends GetxController {
 
   int get totalTripPrice => (tripDurationInMins * tripDistance).toInt();
 
-  updateCurrentPosition() async {
-    currentPosition = await Geolocator.getCurrentPosition();
-  }
-
-  LatLng? get currentLatLng {
-    if (currentPosition != null) {
-      return LatLng(currentPosition!.latitude, currentPosition!.longitude);
+  pickupLocationSelectedByPlace(Place place) async {
+    if (pickup == null) {
+      pickup = TripLocationModel("Pickup", place.location.latitude, place.location.longitude, BitmapDescriptor.hueAzure);
+    } else {
+      pickup!.updateLatLng(place.location);
     }
-    return null;
-  }
-
-  Future<String?> getAddressFromLatLng(latlng) async {
-    try {
-      List<Placemark> p = await placemarkFromCoordinates(latlng.latitude, latlng.longitude);
-      Placemark place = p[0];
-      return "${place.subLocality}, ${place.street}, ${place.locality}";
-    } catch (e) {
-      //
+    if (isDestinationLocationIsValid) {
+      await _fetchTripDirection();
     }
-  }
-
-  updatePickupAddress() async => pickupAddress = await getAddressFromLatLng(pickupLatLng);
-
-  updateDestinationAddress() async => destinationAddress = await getAddressFromLatLng(destinationLatLng);
-
-  updatePickupMarker() {
-    markers['pickup'] = Marker(
-      markerId: const MarkerId('pickup'),
-      infoWindow: const InfoWindow(title: 'pickup'),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
-      position: pickupLatLng as LatLng,
-    );
-  }
-
-  updateDestinationMarker() {
-    markers['destination'] = Marker(
-      markerId: const MarkerId('destination'),
-      infoWindow: const InfoWindow(title: 'destination'),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      position: destinationLatLng as LatLng,
-    );
-  }
-
-  pickupLocationSelectedByPlace(Place place) {
-    pickupLatLng = place.location;
-    updatePickupAddress();
-    updatePickupMarker();
     update();
   }
 
   destinationLocationSelectedByPlace(Place place) async {
-    destinationLatLng = place.location;
-    updateDestinationAddress();
-    updateDestinationMarker();
+    if (destination == null) {
+      destination = TripLocationModel("Destination", place.location.latitude, place.location.longitude, BitmapDescriptor.hueRose);
+    } else {
+      destination!.updateLatLng(place.location);
+    }
     await _fetchTripDirection();
     update();
   }
 
   pickupLocationByMap() async {
     try {
-      pickupLatLng = currentCameraLatLng;
-      updatePickupAddress();
-      await updatePickupMarker();
+      if (pickup == null) {
+        pickup = TripLocationModel("Pickup", currentCameraLatLng!.latitude, currentCameraLatLng!.longitude, BitmapDescriptor.hueAzure);
+      } else {
+        pickup!.updateLatLng(currentCameraLatLng!);
+      }
+      if (isDestinationLocationIsValid) {
+        await _fetchTripDirection();
+      }
       update();
       return true;
     } catch (e) {
@@ -209,9 +163,11 @@ class NewTripBookingController extends GetxController {
 
   destinationLocationByMap() async {
     try {
-      destinationLatLng = currentCameraLatLng;
-      updateDestinationAddress();
-      await updateDestinationMarker();
+      if (destination == null) {
+        destination = TripLocationModel("Destination", currentCameraLatLng!.latitude, currentCameraLatLng!.longitude, BitmapDescriptor.hueRose);
+      } else {
+        destination!.updateLatLng(currentCameraLatLng!);
+      }
       await _fetchTripDirection();
       update();
       return true;
@@ -220,17 +176,13 @@ class NewTripBookingController extends GetxController {
     }
   }
 
-  bool isPickupLocationIsValid() {
-    if (pickupLatLng != null && pickupAddress!.isNotEmpty) return true;
-    return false;
-  }
-
-  bool isDestinationLocationIsValid() => destinationLatLng != null && destinationAddress!.isNotEmpty;
+  bool get isPickupLocationIsValid => pickup != null;
+  bool get isDestinationLocationIsValid => destination != null;
 
   _fetchTripDirection() async {
     final directions = await DirectionsController().getDirections(
-      origin: markers['pickup']!.position,
-      destination: markers['destination']!.position,
+      origin: pickup!.latlng,
+      destination: destination!.latlng,
     );
     tripDirections = directions;
   }
@@ -241,11 +193,15 @@ class NewTripBookingController extends GetxController {
     var riderData = await getRiderData(riderId);
 
     bookedTripController.bookedTrip = BookedTripModel(
+      id: tripId,
+      bookedAt: DateTime.now().toString(),
+      destinationAddress: destination!.address!,
+      pickupAddress: pickup!.address!,
       userId: userData.id,
       userName: '${userData['firstName']} ${userData['lastName']}',
       userPhone: userData['phoneNumber'],
-      userPickupLocation: pickupLatLng as LatLng,
-      userDestinationLocation: destinationLatLng as LatLng,
+      userPickupLocation: pickup!.latlng,
+      userDestinationLocation: destination!.latlng,
       riderId: riderId,
       riderName: '${riderData['firstName']} ${riderData['lastName']}',
       riderPhone: riderData['phoneNumber'],
@@ -270,8 +226,8 @@ class NewTripBookingController extends GetxController {
 
   _createNewTripInstance(String tripId) async {
     await FirebaseFirestore.instance.collection('inProcessingTrips').doc(tripId).set({
-      'lat': pickupLatLng!.latitude.toString(),
-      'lng': pickupLatLng!.longitude.toString(),
+      'lat': pickup!.latitude.toString(),
+      'lng': pickup!.longitude.toString(),
       'vehicle': selectedVehicle,
       "createdAt": FieldValue.serverTimestamp(),
     });
@@ -315,7 +271,7 @@ class NewTripBookingController extends GetxController {
       availableRidersLocation.addAll({rider.doc.id: marker});
       requestNearbyRider.addRider(
         rider.doc.id,
-        haversineDistance(pickupLatLng!, position),
+        haversineDistance(pickup!.latlng, position),
       );
       update();
     }
@@ -385,7 +341,23 @@ class NewTripBookingController extends GetxController {
     update();
   }
 
-  onBackButtonPressed() {}
+  void resetBookingState() {
+    tripBookingStep = 0;
+    pickup = null;
+    destination = null;
+    availableRidersLocation.clear();
+    tripDirections = null;
+  }
+
+  Future<String?> getAddressFromLatLng(LatLng latlng) async {
+    try {
+      List<Placemark> p = await placemarkFromCoordinates(latlng.latitude, latlng.longitude);
+      Placemark place = p[0];
+      return "${place.subLocality}, ${place.street}, ${place.locality}";
+    } catch (e) {
+      "Error: $e".printInfo();
+    }
+  }
 }
 
 class RequestNearbyRider {
@@ -479,9 +451,12 @@ class RequestNearbyRider {
         null,
         Icons.check_circle,
       );
+      Get.dialog(const LoadingDialog("Booking the Trip"));
       //  Rider have accepted the ride
       if (await onRiderAcceptTrip(tripId, riderId)) {
         printInfo(info: 'Successfully Added booking');
+        if (Get.isDialogOpen!) Get.back();
+        Get.find<NavigationController>().moveToMyTrips();
       }
     } else {
       //  Rider have rejected the ride
@@ -522,41 +497,5 @@ class RequestNearbyRider {
       );
       //  Remove the extra data from the Firestore
     }
-  }
-}
-
-class LoadingDialog extends StatelessWidget {
-  const LoadingDialog(this.title, {Key? key}) : super(key: key);
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: SizedBox(
-        height: 200,
-        width: 300,
-        child: Column(
-          children: [
-            SizedBox(
-              height: 50,
-              child: Center(
-                child: Text(
-                  title,
-                  style: AppTextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            const Expanded(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

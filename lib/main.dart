@@ -1,11 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'app/FCMConfiguration/fcm_configuration.dart';
-import 'app/data/services/app_dependencies.dart';
+import 'app/ui/theme/theme_binding.dart';
 import 'app/data/services/dependency_injection.dart';
 import 'app/data/services/translations_service.dart';
 import 'app/routes/app_pages.dart';
@@ -21,8 +22,7 @@ Future<void> main() async {
   FirebaseMessaging.onMessage.listen(firebaseForegroundMessage);
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
   FirebaseMessaging.instance.requestPermission();
-  FirebaseMessaging.onMessageOpenedApp.listen(firebaseOnMessageClicked,
-      onError: (error) {
+  FirebaseMessaging.onMessageOpenedApp.listen(firebaseOnMessageClicked, onError: (error) {
     print('Error: $error');
   }, onDone: () {
     print('Done Message');
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       darkTheme: darkTheme,
       theme: lightTheme,
-      initialBinding: AppDependencies(context),
+      initialBinding: ThemeBinding(context),
       title: 'Cab',
       debugShowCheckedModeBanner: false,
       translations: Translation(),

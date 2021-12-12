@@ -11,7 +11,6 @@ export 'otp_controller.dart';
 export 'phone_input_controller.dart';
 export 'place_controller.dart';
 export 'splash_controller.dart';
-export 'theme_controller.dart';
 export 'trip_feedback_controller.dart';
 export 'unknown_route_controller.dart';
 export 'user_controller.dart';

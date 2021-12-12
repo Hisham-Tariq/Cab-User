@@ -1,3 +1,4 @@
+import 'package:driving_app_its/app/controllers/navigation_controller.dart';
 import 'package:flutter/material.dart';
 
 import '../../../global_widgets/spacers.dart';
@@ -40,9 +41,8 @@ class NotEligibleForBooking extends StatelessWidget {
             const VerticalSpacer(space: 16.0),
             const Text("You can not book a new trip until you complete your previous."),
             const VerticalSpacer(space: 16.0),
-            // TODO: Add Click Action Functionality
             TextButton(
-              onPressed: () {},
+              onPressed: Get.find<NavigationController>().moveToMyTrips,
               child: const Text("Go to My Trips"),
               style: TextButton.styleFrom(
                 fixedSize: Size(Get.width, 50),

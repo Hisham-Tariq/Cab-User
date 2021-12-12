@@ -1,6 +1,6 @@
-import 'package:driving_app_its/app/ui/theme/text_theme.dart';
+import 'text_theme.dart';
 import 'package:flutter/material.dart';
-import './theme_colors.dart';
+import 'colors/colors_interface.dart';
 
 TextTheme textTheme(TextTheme textTheme) {
   return TextTheme(
@@ -38,6 +38,8 @@ class CustomTheme {
       brightness: brightness,
       useMaterial3: true,
       scaffoldBackgroundColor: colors.surface,
+      backgroundColor: colors.surface,
+      canvasColor: colors.surface,
       textSelectionTheme: TextSelectionThemeData(
         selectionColor: colors.secondary,
         selectionHandleColor: colors.secondary,
@@ -89,17 +91,30 @@ class CustomTheme {
         // extendedtextStyle: Themes.AppTextStyleFamily.copyWith(),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        border: const OutlineInputBorder(),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade500),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: colors.secondary,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: colors.onSurface,
+            ),
           ),
-        ),
-      ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: colors.secondary,
+            ),
+          ),
+          focusedErrorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.red,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: colors.error,
+            ),
+          ),
+          errorStyle: AppTextStyle(
+            color: colors.error,
+          )),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: colors.surfaceVariant,
         shape: const RoundedRectangleBorder(

@@ -49,8 +49,11 @@ class AppDrawer extends GetView<NavigationController> {
                     onTap: () async {
                       Get.back();
                       await Future.delayed(const Duration(milliseconds: 250));
-                      item.onTap();
-                      controller.onDrawerItemClicked(item);
+                      if (item.itemType == DrawerItemType.callAble) {
+                        item.onTap!();
+                      } else {
+                        controller.onDrawerItemClicked(item);
+                      }
                     },
                   ),
               ],

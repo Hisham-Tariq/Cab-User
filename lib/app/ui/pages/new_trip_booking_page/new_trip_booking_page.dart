@@ -1,6 +1,6 @@
-import 'package:driving_app_its/app/controllers/controllers.dart';
-import 'package:driving_app_its/app/ui/pages/new_trip_booking_page/sub_pages/not_eligible.dart';
-import 'package:driving_app_its/app/ui/utils/utils.dart';
+import '../../../controllers/controllers.dart';
+import 'sub_pages/not_eligible.dart';
+import '../../utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -43,9 +43,12 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
       child: GetBuilder<NewTripBookingController>(
         dispose: (state) {
           controller.googleMapController = null;
+          controller.resetBookingState();
+        },
+        initState: (state) {
         },
         builder: (logic) {
-          if (logic.currentLatLng == null) {
+          if (logic.currentCameraLatLng == null) {
             return Center(
               child: SpinKitCircle(
                 color: context.theme.colorScheme.primary,
@@ -67,8 +70,8 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                       changeMapStyle(context);
                     },
                     markers: {
-                      logic.markers['pickup'] as Marker,
-                      if (logic.markers['destination'] != null) logic.markers['destination'] as Marker,
+                      if (logic.pickup != null) logic.pickup!.marker,
+                      if (logic.destination != null) logic.destination!.marker,
                       if (controller.availableRidersLocation.isNotEmpty) ...controller.availableRidersLocation.values.toSet(),
                     },
                     polylines: {
@@ -116,9 +119,9 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                     top: logic.tripBookingStep == 1 ? 0 : Get.height,
                     child: SetLocation(
                       title: 'Pickup',
-                      intialAddress: controller.pickupAddress!,
+                      intialAddress: controller.pickup != null ? controller.pickup!.address ?? "" : "",
                       onContinue: () {
-                        if (logic.isPickupLocationIsValid()) {
+                        if (logic.isPickupLocationIsValid) {
                           logic.forwardBookingState();
                         } else {
                           showAppSnackBar(
@@ -137,8 +140,9 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                     top: logic.tripBookingStep == 2 ? 0 : Get.height,
                     child: SetLocation(
                       title: 'Destination',
+                      intialAddress: controller.destination != null ? controller.destination!.address ?? "" : "",
                       onContinue: () {
-                        if (logic.isDestinationLocationIsValid()) {
+                        if (logic.isDestinationLocationIsValid) {
                           logic.forwardBookingState();
                         } else {
                           showAppSnackBar(
@@ -171,8 +175,8 @@ class NewTripBookingPage extends GetView<NewTripBookingController> {
                         tripInfo: {
                           'distance': logic.tripDirections!.totalDistance,
                           'duration': logic.tripDirections!.totalDuration,
-                          'destination': logic.destinationAddress as String,
-                          'pickup': logic.pickupAddress as String,
+                          'destination': logic.destination!.address!,
+                          'pickup': logic.pickup!.address!,
                         },
                       ),
                     ),

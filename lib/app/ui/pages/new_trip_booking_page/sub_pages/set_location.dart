@@ -110,7 +110,7 @@ class _SetLocationState extends State<SetLocation> {
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                     ),
                     onChanged: (value) {
-                      var userLoc = Get.find<NewTripBookingController>().currentLatLng;
+                      var userLoc = Get.find<NewTripBookingController>().currentCameraLatLng;
 
                       _searchPlaceBouncer.run(() {
                         var placeController = PlaceController();
@@ -220,8 +220,9 @@ class _SetLocationState extends State<SetLocation> {
             onPressed: () async {
               var logic = Get.find<NewTripBookingController>();
               widget.onLocationSelectedByMap();
-              logic.getAddressFromLatLng(logic.currentCameraLatLng).then((value) {
-                _fieldController.text = value as String;
+              
+              logic.getAddressFromLatLng(logic.currentCameraLatLng!).then((value) {
+                _fieldController.text = value ?? "";
               });
             },
             style: OutlinedButton.styleFrom(

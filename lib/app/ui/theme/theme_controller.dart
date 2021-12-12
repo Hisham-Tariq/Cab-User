@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../ui/theme/base_theme.dart';
-import '../ui/theme/theme.dart';
-import '../ui/theme/theme_colors.dart';
+import 'package:flutter/services.dart';
+import 'theme_data.dart';
+import 'theme.dart';
+import 'colors/colors_interface.dart';
 // import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';

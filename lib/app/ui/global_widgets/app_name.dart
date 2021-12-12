@@ -1,6 +1,6 @@
-import 'package:driving_app_its/app/controllers/controllers.dart';
 import 'package:driving_app_its/app/ui/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/context_extensions.dart';
 
 import '../theme/text_theme.dart';
 
@@ -18,7 +18,7 @@ class AppName extends StatelessWidget {
           style: AppTextStyle(
             fontSize: ResponsiveSize.height(textSize),
             fontWeight: FontWeight.bold,
-            color: ThemeController.CurrentTheme(context).primary,
+            color: context.theme.colorScheme.primary,
           ),
         ),
         Text(

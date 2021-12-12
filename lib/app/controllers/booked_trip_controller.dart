@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:driving_app_its/app/models/models.dart';
 import 'package:get/get_utils/src/extensions/dynamic_extensions.dart';
+
+import '../data/models/booked_trip_model/booked_trip_model.dart';
 
 class BookedTripController {
   var tripsRef = FirebaseFirestore.instance.collection('BookedTrips');
@@ -18,7 +19,7 @@ class BookedTripController {
       // do {
       //   tripId = getRandomString(30);
       // } while (await this.doesTripIdExist(tripId));
-      await tripsRef.doc(tripId).set(bookedTrip!.toCreateJson());
+      await tripsRef.doc(tripId).set(bookedTrip!.toJson());
       await FirebaseFirestore.instance
           .collection('users')
           .doc(bookedTrip!.userId)
