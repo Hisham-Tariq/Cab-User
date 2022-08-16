@@ -114,14 +114,20 @@ class ChoseVehicle extends StatelessWidget {
     );
   }
 
+  // calculatePrice(key) {
+  //   var controller = Get.find<NewTripBookingController>();
+  //   var vehiclePrices = controller.prices!['default'];
+  //   var surgeBoost = controller.prices!['surgeBoost'];
+  //   return ((vehiclePrices['baseFare'] +
+  //           ((vehiclePrices['costPerMin'] * controller.tripDurationInMins) + (vehiclePrices['costPerKm'] * controller.tripDistance)) * surgeBoost +
+  //           vehiclePrices['bookingFee']) as double)
+  //       .toInt();
+  // }
+
   calculatePrice(key) {
     var controller = Get.find<NewTripBookingController>();
-    var vehiclePrices = controller.prices![key];
-    var surgeBoost = controller.prices!['surgeBoost'];
-    return ((vehiclePrices['baseFare'] +
-            ((vehiclePrices['costPerMin'] * controller.tripDurationInMins) + (vehiclePrices['costPerKm'] * controller.tripDistance)) * surgeBoost +
-            vehiclePrices['bookingFee']) as double)
-        .toInt();
+    var surgeBoost = 20;
+    return ((30 +((5 * controller.tripDurationInMins) + (5 * controller.tripDistance)) * surgeBoost +30)).toInt();
   }
 
   vehicleTypeWidget() {

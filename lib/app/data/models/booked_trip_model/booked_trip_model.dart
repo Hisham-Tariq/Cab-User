@@ -18,7 +18,7 @@ abstract class BookedTripModel implements _$BookedTripModel {
     required String id,
     required String userId,
     required String userName,
-    required String userPhone, 
+    required String userPhone,
     @LatLngJsonConverter() required LatLng userDestinationLocation,
     required String destinationAddress,
     @LatLngJsonConverter() required LatLng userPickupLocation,
@@ -39,7 +39,8 @@ abstract class BookedTripModel implements _$BookedTripModel {
 
   // factory BookedTripModel.empty() => BookedTripModel(id: '',);
 
-  factory BookedTripModel.fromDocument(DocumentSnapshot doc) => BookedTripModel.fromJson(ModelHelpers().fromDocument(doc.data()!)).copyWith(id: doc.id);
+  factory BookedTripModel.fromDocument(DocumentSnapshot doc) =>
+      BookedTripModel.fromJson(ModelHelpers().fromDocument(doc.data()!)).copyWith(id: doc.id);
 
   Map<String, dynamic> toDocument() => ModelHelpers().toDocument(toJson());
 
@@ -56,6 +57,10 @@ class LatLngJsonConverter implements JsonConverter<LatLng, Map<String, dynamic>>
   const LatLngJsonConverter();
   @override
   LatLng fromJson(Map<String, dynamic> json) {
+    if (json["lat"] is String) {
+      return LatLng(double.parse(json["lat"]), double.parse(json["lng"]));
+    }
+    print(json["lat"].runtimeType);
     return LatLng(json["lat"]!, json["lng"]!);
   }
 

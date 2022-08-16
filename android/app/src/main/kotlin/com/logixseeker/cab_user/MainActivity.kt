@@ -1,4 +1,4 @@
-package com.logixseeker.cab_user
+package com.hisham.cab_user
 
 import io.flutter.embedding.android.FlutterActivity
 

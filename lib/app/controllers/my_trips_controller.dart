@@ -9,8 +9,7 @@ import '../data/models/booked_trip_model/booked_trip_model.dart';
 class MyTripsController extends GetxController {
   var bookedTripsReference = FirebaseFirestore.instance
       .collection("BookedTrips")
-      .where("userId", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-      .orderBy("bookedAt", descending: true);
+      .where("userId", isEqualTo: FirebaseAuth.instance.currentUser!.uid);
 
   late StreamSubscription<QuerySnapshot> _userTripsListener;
 
@@ -25,6 +24,7 @@ class MyTripsController extends GetxController {
   _listenToUserTrips() async {
     _userTripsListener = bookedTripsReference.snapshots().listen((event) {
       trips.clear();
+      print("event.docs.length: ${event.docs.length}");
       for (var element in event.docs) {
         trips.add(BookedTripModel.fromDocument(element));
       }
