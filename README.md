@@ -1,5 +1,4 @@
-# driving_app_its
-
+# Cab-User
 A Uber like app for the region Gujrat
 
 ## Getting Started
